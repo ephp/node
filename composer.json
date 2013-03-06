@@ -1,0 +1,22 @@
+{
+    "name": "ephp/node",
+    "type": "symfony-bundle",
+    "description": "Bundle con funzioni di utilità varie",
+    "keywords": ["node.js", "ephp", "symfony-2.1"],
+    "homepage": "https://github.com/ephp/Node",
+    "license": "MIT",
+    "authors": [
+            {
+                "name": "Ephraim Pepe",
+                "email": "ephraim.pepe@gmail.com"
+            }
+    ],
+    "require": {
+            "php": ">=5.3.2"
+    },
+    "autoload": {
+            "psr-0": { "Ephp\\NodeBundle": "" }
+    },
+    "target-dir": "Ephp/NodeBundle",
+    "minimum-stability": "dev"
+}
