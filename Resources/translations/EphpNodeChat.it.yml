@@ -2,6 +2,8 @@ chat:
   messages:
     server: | 
       server: 'Server',
+      default_room: 'Italiano',
+      default_locale: 'it',
       connect: 'Ciao __nickname__! Sei entrato nella chatroom __room__',
       reconnect: 'Sei entrato nella chatroom __room__',
       enter: '__nickname__ è entrato nella chatroom',

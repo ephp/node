@@ -35,7 +35,35 @@ class ChatController extends Controller {
         return array(
             'i' => $nickname == $chiama ? $chiama : $risponde,
             'you' => $nickname == $risponde ? $chiama : $risponde,
+            'room' => $this->getChatRoomName(array($chiama, $risponde)),
         );
+    }
+    
+    private function getChatRoomName(array $nicknames) {
+        $em = $this->getEm();
+        $_user = $em->getRepository($this->container->getParameter('ephp_acl.user.class'));
+        $m = $f = array();
+        foreach ($nicknames as $nickname) {
+            $user = $_user->findOneBy(array('nickname' => $nickname));
+            /* @var $user \Ephp\ACLBundle\Model\BaseUser */
+            if(in_array($user->getGender(), array('m', 'male', 'man', 'maschio'))) {
+                $m[] = $user->getId();
+            } else {
+                $f[] = $user->getId();
+            }
+        }
+        sort($f);
+        sort($m);
+        $fm = array_merge($f, $m);
+        return implode('-', $fm);
+    }
+
+    /**
+     *
+     * @return \Doctrine\ORM\EntityManager
+     */
+    private function getEm() {
+        return $this->getDoctrine()->getEntityManager();
     }
 
 }

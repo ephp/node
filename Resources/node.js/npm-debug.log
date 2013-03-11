@@ -1,0 +1,219 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'c:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'c:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'db-mysql' ]
+2 info using npm@1.1.49
+3 info using node@v0.8.7
+4 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\package.json
+5 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\express\package.json
+6 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\mysql\package.json
+7 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\socket.io\package.json
+8 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\sugar\package.json
+9 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\package.json
+10 verbose cache add [ 'db-mysql', null ]
+11 silly cache add name=undefined spec="db-mysql" args=["db-mysql",null]
+12 verbose parsed url { pathname: 'db-mysql', path: 'db-mysql', href: 'db-mysql' }
+13 silly lockFile c75423d9-db-mysql db-mysql
+14 verbose lock db-mysql C:\Users\Ephraim\AppData\Roaming\npm-cache\c75423d9-db-mysql.lock
+15 silly lockFile c75423d9-db-mysql db-mysql
+16 verbose addNamed [ 'db-mysql', '' ]
+17 verbose addNamed [ null, '' ]
+18 silly lockFile a4731413-db-mysql db-mysql@
+19 verbose lock db-mysql@ C:\Users\Ephraim\AppData\Roaming\npm-cache\a4731413-db-mysql.lock
+20 silly addNameRange { name: 'db-mysql', range: '', hasData: false }
+21 verbose url raw db-mysql
+22 verbose url resolving [ 'https://registry.npmjs.org/', './db-mysql' ]
+23 verbose url resolved https://registry.npmjs.org/db-mysql
+24 info retry registry request attempt 1 at 10:38:33
+25 verbose etag "6DQAC56ESDZBCUEX3NM5M7ZKU"
+26 http GET https://registry.npmjs.org/db-mysql
+27 http 304 https://registry.npmjs.org/db-mysql
+28 silly registry.get cb [ 304,
+28 silly registry.get   { server: 'CouchDB/1.2.1 (Erlang OTP/R15B03)',
+28 silly registry.get     etag: '"6DQAC56ESDZBCUEX3NM5M7ZKU"',
+28 silly registry.get     date: 'Fri, 08 Mar 2013 09:38:32 GMT',
+28 silly registry.get     'content-length': '0' } ]
+29 verbose etag db-mysql from cache
+30 silly addNameRange number 2 { name: 'db-mysql', range: '', hasData: true }
+31 silly addNameRange versions [ 'db-mysql',
+31 silly addNameRange   [ '0.4.0',
+31 silly addNameRange     '0.4.1',
+31 silly addNameRange     '0.4.2',
+31 silly addNameRange     '0.4.3',
+31 silly addNameRange     '0.4.4',
+31 silly addNameRange     '0.4.5',
+31 silly addNameRange     '0.4.6',
+31 silly addNameRange     '0.4.7',
+31 silly addNameRange     '0.4.8',
+31 silly addNameRange     '0.4.9',
+31 silly addNameRange     '0.5.0',
+31 silly addNameRange     '0.5.1',
+31 silly addNameRange     '0.5.2',
+31 silly addNameRange     '0.5.3',
+31 silly addNameRange     '0.5.4',
+31 silly addNameRange     '0.5.5',
+31 silly addNameRange     '0.5.6',
+31 silly addNameRange     '0.5.7',
+31 silly addNameRange     '0.5.8',
+31 silly addNameRange     '0.5.9',
+31 silly addNameRange     '0.6.0',
+31 silly addNameRange     '0.6.1',
+31 silly addNameRange     '0.6.2',
+31 silly addNameRange     '0.6.3',
+31 silly addNameRange     '0.6.4',
+31 silly addNameRange     '0.6.5',
+31 silly addNameRange     '0.6.6',
+31 silly addNameRange     '0.6.7',
+31 silly addNameRange     '0.6.8',
+31 silly addNameRange     '0.6.9',
+31 silly addNameRange     '0.7.0',
+31 silly addNameRange     '0.7.1',
+31 silly addNameRange     '0.7.2',
+31 silly addNameRange     '0.7.3',
+31 silly addNameRange     '0.7.4',
+31 silly addNameRange     '0.7.5',
+31 silly addNameRange     '0.7.6' ] ]
+32 verbose addNamed [ 'db-mysql', '0.7.6' ]
+33 verbose addNamed [ '0.7.6', '0.7.6' ]
+34 silly lockFile f70b617c-db-mysql-0-7-6 db-mysql@0.7.6
+35 verbose lock db-mysql@0.7.6 C:\Users\Ephraim\AppData\Roaming\npm-cache\f70b617c-db-mysql-0-7-6.lock
+36 verbose read json C:\Users\Ephraim\AppData\Roaming\npm-cache\db-mysql\0.7.6\package\package.json
+37 silly lockFile f70b617c-db-mysql-0-7-6 db-mysql@0.7.6
+38 silly lockFile a4731413-db-mysql db-mysql@
+39 silly resolved [ { name: 'db-mysql',
+39 silly resolved     description: 'MySQL database bindings for Node.JS',
+39 silly resolved     keywords:
+39 silly resolved      [ 'database',
+39 silly resolved        'db',
+39 silly resolved        'native',
+39 silly resolved        'binding',
+39 silly resolved        'library',
+39 silly resolved        'plugin',
+39 silly resolved        'client',
+39 silly resolved        'mysql',
+39 silly resolved        'libmysql' ],
+39 silly resolved     homepage: 'http://nodejsdb.org/db-mysql',
+39 silly resolved     version: '0.7.6',
+39 silly resolved     engines: { node: '>=0.4.1' },
+39 silly resolved     maintainers: [ [Object] ],
+39 silly resolved     bugs: { url: 'http://github.com/mariano/node-db-mysql/issues' },
+39 silly resolved     licenses: [ [Object] ],
+39 silly resolved     repositories: [ [Object] ],
+39 silly resolved     main: './db-mysql',
+39 silly resolved     scripts:
+39 silly resolved      { install: 'node-waf configure build',
+39 silly resolved        preuninstall: 'rm -rf build/*',
+39 silly resolved        test: 'node-waf test',
+39 silly resolved        doc: 'node-waf doc' },
+39 silly resolved     devDependencies: { nodeunit: '*', nodelint: '*' },
+39 silly resolved     readme: '# db-mysql: MySQL database bindings for Node.js #\n\nFor detailed information about this and other Node.js\ndatabase bindings visit the [Node.js db-mysql homepage] [homepage].\n\n## INSTALL ##\n\nBefore proceeding with installation, you need to have the libmysql\ndevelopment libraries and include files. Access to the mysql_config \nbinary is mandatory, and its path has to be specified prior to \ninstallation (if its not within the system\'s path). For example, if \nthe path to your mysql_config is /usr/local/bin/mysql_config make \nsure to do the following (Ubuntu users need to install the \nlibmysqlclient-dev package):\n\n```bash\n$ export MYSQL_CONFIG=/usr/local/bin/mysql_config\n```\n\nOnce you are sure that either mysql_config is part of the path or that\nyou specified the MYSQL_CONFIG environment var, install with npm:\n\n```bash\n$ npm install db-mysql\n```\n\n## QUICK START ##\n\n```javascript\nvar mysql = require(\'db-mysql\');\nnew mysql.Database({\n    hostname: \'localhost\',\n    user: \'root\',\n    password: \'password\',\n    database: \'node\'\n}).connect(function(error) {\n    if (error) {\n        return console.log("CONNECTION ERROR: " + error);\n    }\n\n    this.query().select(\'*\').from(\'users\').execute(function(error, rows) {\n        if (error) {\n            return console.log(\'ERROR: \' + error);\n        }\n        console.log(rows.length + \' ROWS\');\n    });\n});\n```\n\n## LICENSE ##\n\nThis module is released under the [MIT License] [license].\n\n[homepage]: http://nodejsdb.org/db-mysql\n[license]: http://www.opensource.org/licenses/mit-license.php\n',
+39 silly resolved     _id: 'db-mysql@0.7.6',
+39 silly resolved     _from: 'db-mysql' } ]
+40 info install db-mysql@0.7.6 into d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js
+41 info installOne db-mysql@0.7.6
+42 verbose from cache C:\Users\Ephraim\AppData\Roaming\npm-cache\db-mysql\0.7.6\package\package.json
+43 info d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql unbuild
+44 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql\package.json
+45 verbose tar unpack C:\Users\Ephraim\AppData\Roaming\npm-cache\db-mysql\0.7.6\package.tgz
+46 silly lockFile 428ac02b-es-node-js-node-modules-db-mysql d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql
+47 verbose lock d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql C:\Users\Ephraim\AppData\Roaming\npm-cache\428ac02b-es-node-js-node-modules-db-mysql.lock
+48 silly gunzTarPerm modes [ '777', '666' ]
+49 silly gunzTarPerm extractEntry package.json
+50 silly gunzTarPerm extractEntry .npmignore
+51 silly gunzTarPerm extractEntry README.md
+52 silly gunzTarPerm extractEntry mysql-test-manual-query.js
+53 silly gunzTarPerm extractEntry mysql-test-no-connection.js
+54 silly gunzTarPerm extractEntry mysql-test-long-number.js
+55 silly gunzTarPerm extractEntry mysql-test-sync-update.js
+56 silly gunzTarPerm extractEntry mysql-test-sync.js
+57 silly gunzTarPerm extractEntry mysql-test.js
+58 silly gunzTarPerm extractEntry mysql-test-long.js
+59 silly gunzTarPerm extractEntry mysql-test-insert.js
+60 silly gunzTarPerm extractEntry t.js
+61 silly gunzTarPerm extractEntry mysql-test-async.js
+62 silly gunzTarPerm extractEntry tests-db.js
+63 silly gunzTarPerm extractEntry db-mysql.js
+64 silly gunzTarPerm extractEntry mysql-test-placeholder.js
+65 silly gunzTarPerm extractEntry tests.js
+66 silly gunzTarPerm extractEntry lib/node-db/README.md
+67 silly gunzTarPerm extractEntry lib/node-db/tests.js
+68 silly gunzTarPerm extractEntry lib/node-db/connection.cc
+69 silly gunzTarPerm extractEntry lib/node-db/connection.h
+70 silly gunzTarPerm extractEntry lib/node-db/events.cc
+71 silly gunzTarPerm extractEntry lib/node-db/events.h
+72 silly gunzTarPerm extractEntry lib/node-db/exception.cc
+73 silly gunzTarPerm extractEntry lib/node-db/binding.h
+74 silly gunzTarPerm extractEntry lib/node-db/node_defs.h
+75 silly gunzTarPerm extractEntry lib/node-db/query.cc
+76 silly gunzTarPerm extractEntry lib/node-db/query.h
+77 silly gunzTarPerm extractEntry lib/node-db/binding.cc
+78 silly gunzTarPerm extractEntry lib/node-db/result.cc
+79 silly gunzTarPerm extractEntry lib/node-db/result.h
+80 silly gunzTarPerm extractEntry lib/node-db/exception.h
+81 silly gunzTarPerm extractEntry src/connection.cc
+82 silly gunzTarPerm extractEntry src/connection.h
+83 silly gunzTarPerm extractEntry src/mysql.cc
+84 silly gunzTarPerm extractEntry src/mysql.h
+85 silly gunzTarPerm extractEntry src/mysql_bindings.cc
+86 silly gunzTarPerm extractEntry src/query.cc
+87 silly gunzTarPerm extractEntry src/query.h
+88 silly gunzTarPerm extractEntry src/result.cc
+89 silly gunzTarPerm extractEntry src/result.h
+90 silly gunzTarPerm extractEntry CHANGELOG
+91 silly gunzTarPerm extractEntry .gitmodules
+92 silly gunzTarPerm extractEntry tests-settings.json
+93 silly gunzTarPerm extractEntry doc/api.html
+94 silly gunzTarPerm extractEntry doc/changelog.html
+95 silly gunzTarPerm extractEntry doc/index.html
+96 silly gunzTarPerm extractEntry wscript
+97 verbose read json d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql\package.json
+98 silly lockFile 428ac02b-es-node-js-node-modules-db-mysql d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql
+99 info preinstall db-mysql@0.7.6
+100 verbose from cache d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql\package.json
+101 verbose readDependencies using package.json deps
+102 verbose from cache d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql\package.json
+103 verbose readDependencies using package.json deps
+104 silly resolved []
+105 verbose about to build d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql
+106 info build d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql
+107 verbose from cache d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql\package.json
+108 verbose linkStuff [ false,
+108 verbose linkStuff   false,
+108 verbose linkStuff   false,
+108 verbose linkStuff   'd:\\htdocs\\italiaccessibile\\vendor\\ephp\\node\\Ephp\\NodeBundle\\Resources\\node.js\\node_modules' ]
+109 info linkStuff db-mysql@0.7.6
+110 verbose linkBins db-mysql@0.7.6
+111 verbose linkMans db-mysql@0.7.6
+112 verbose rebuildBundles db-mysql@0.7.6
+113 info install db-mysql@0.7.6
+114 verbose unsafe-perm in lifecycle true
+115 silly exec cmd "/c" "node-waf configure build"
+116 silly cmd,/c,node-waf configure build,d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql spawning
+117 info db-mysql@0.7.6 Failed to exec install script
+118 info d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql unbuild
+119 verbose from cache d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql\package.json
+120 info preuninstall db-mysql@0.7.6
+121 verbose unsafe-perm in lifecycle true
+122 silly exec cmd "/c" "rm -rf build/*"
+123 silly cmd,/c,rm -rf build/*,d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules\db-mysql spawning
+124 info uninstall db-mysql@0.7.6
+125 verbose true,d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules,d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js\node_modules unbuild db-mysql@0.7.6
+126 info postuninstall db-mysql@0.7.6
+127 error db-mysql@0.7.6 install: `node-waf configure build`
+127 error `cmd "/c" "node-waf configure build"` failed with 1
+128 error Failed at the db-mysql@0.7.6 install script.
+128 error This is most likely a problem with the db-mysql package,
+128 error not with npm itself.
+128 error Tell the author that this fails on your system:
+128 error     node-waf configure build
+128 error You can get their info via:
+128 error     npm owner ls db-mysql
+128 error There is likely additional logging output above.
+129 error System Windows_NT 6.1.7601
+130 error command "c:\\Program Files\\nodejs\\node.exe" "c:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "db-mysql"
+131 error cwd d:\htdocs\italiaccessibile\vendor\ephp\node\Ephp\NodeBundle\Resources\node.js
+132 error node -v v0.8.7
+133 error npm -v 1.1.49
+134 error code ELIFECYCLE
+135 verbose exit [ 1, true ]

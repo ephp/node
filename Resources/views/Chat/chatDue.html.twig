@@ -9,28 +9,47 @@
     // on connection to server, ask for user's name with an anonymous callback
     socket.on('connect', function() {
         // call the server-side function 'adduser' and send one parameter (value of prompt)
-        socket.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} });
+        socket.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} }, {chatroom: '{{ room }}', alias: '{{ you }}'});
     });
 
     // listener, whenever the server emits 'updatechat', this updates the chat body
     socket.on('updatechat', function(username, data) {
-        $('#conversation').append('<b>' + username + ':</b> ' + data + '<br>');
+        $('#conversation').append('<b title="' + data.send_at + '">' + username + ':</b> ' + data.message + '<br>');
+    });
+
+    // listener, whenever the server emits 'updatechat', this updates the chat body
+    socket.on('updatenotice', function(username, data) {
+        $('#notice').append('<b>' + username + ':</b> ' + data + '<br>');
     });
 
     // listener, whenever the server emits 'updaterooms', this updates the room the client is in
     socket.on('updaterooms', function(rooms, current_room) {
         $('#rooms').empty();
+        console.log(current_room);
+        console.log(rooms);
         $.each(rooms, function(key, value) {
-            if (value == current_room) {
-                $('#rooms').append('<div>' + value + '</div>');
+            console.log(value);
+            if (value.chatroom == current_room) {
+                $('#current_room').html('<div>' + value.alias + '</div>');
+            } else {
+                $('#rooms').append('<div><a href="#" onclick="switchRoom(\'' + value.id + '\')">' + value.alias + '</a></div>');
             }
-            else {
-                $('#rooms').append('<div><a href="#" onclick="switchRoom(\'' + value + '\')">' + value + '</a></div>');
+        });
+    });
+    // listener, whenever the server emits 'updaterooms', this updates the room the client is in
+    socket.on('updateusers', function(users) {
+        $('#users').empty();
+        $.each(users, function(key, value) {
+            if (value == '{{ app.user.nickname }}') {
+                $('#users').append('<div>' + value.nickname + '</div>');
+            } else {
+                $('#users').append('<div class="' + value.gender + '" title="' + value.gender + '">' + value.nickname + '</div>');
             }
         });
     });
 
     function switchRoom(room) {
+        $('#conversation').html('');
         socket.emit('switchRoom', room);
     }
 
@@ -60,13 +79,17 @@
     <table>
         <tr>
             <td style="width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+                <b>USERS</b>
+                <div id="users"></div>
                 <b>ROOMS</b>
+                <div id="current_room"></div>
                 <div id="rooms"></div>
             </td>
             <td style="width:300px;height:250px;overflow:scroll-y;padding:10px;">
                 <div id="conversation"></div>
                 <input id="data" style="width:200px;" />
                 <input type="button" id="datasend" value="send" />
+                <div id="notice"></div>
             </td>
         </tr>
     </table>

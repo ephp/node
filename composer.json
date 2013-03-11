@@ -12,7 +12,8 @@
             }
     ],
     "require": {
-            "php": ">=5.3.2"
+            "php": ">=5.3.2",
+            "ephp/acl": "master"
     },
     "autoload": {
             "psr-0": { "Ephp\\NodeBundle": "" }
