@@ -20,9 +20,26 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('ephp_node');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode
+                ->children()
+                    ->arrayNode('tables')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('tb_user')->defaultValue('ephp_users')->cannotBeEmpty()->end()
+                            ->scalarNode('tb_chat_room')->defaultValue('chat_room')->cannotBeEmpty()->end()
+                            ->scalarNode('tb_chat_messages')->defaultValue('chat_messages')->cannotBeEmpty()->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('chat')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('chat_open_room')->defaultValue(true)->cannotBeEmpty()->end()
+                            ->scalarNode('chat_one_to_one')->defaultValue(true)->cannotBeEmpty()->end()
+                            ->scalarNode('chat_group_room')->defaultValue(false)->cannotBeEmpty()->end()
+                        ->end()
+                    ->end()
+                ->end()
+        ;
 
         return $treeBuilder;
     }

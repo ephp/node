@@ -1,0 +1,148 @@
+{% if app.user %}
+    {% if chat_input_id is not defined %}
+        {% set chat_input_id = 'data' %}
+    {% endif %}
+    {% if chat_button_id is not defined %}
+        {% set chat_button_id = 'data_button' %}
+    {% endif %}
+    {% if chat_prev_id is not defined %}
+        {% set chat_prev_id = 'data_prev' %}
+    {% endif %}
+    {% if user_body is not defined %}
+        {% set user_body = 'users' %}
+    {% endif %}
+    {% if user_elem is not defined %}
+        {% set user_elem = 'user_elem' %}
+    {% endif %}
+    {% if room_body is not defined %}
+        {% set room_body = 'rooms' %}
+    {% endif %}
+    {% if room_elem is not defined %}
+        {% set room_elem = 'room_elem' %}
+    {% endif %}
+    {% if current_room_body is not defined %}
+        {% set current_room_body = 'current_room' %}
+    {% endif %}
+    {% if current_room_elem is not defined %}
+        {% set current_room_elem = 'current_room_elem' %}
+    {% endif %}
+    {% if chat_body is not defined %}
+        {% set chat_body = 'chat_messages' %}
+    {% endif %}
+    {% if chat_message is not defined %}
+        {% set chat_message = 'chat_message' %}
+    {% endif %}
+    {% if notice_body is not defined %}
+        {% set notice_body = 'notice_messages' %}
+    {% endif %}
+    {% if notice_message is not defined %}
+        {% set notice_message = 'notice_message' %}
+    {% endif %}
+    {% if updatechat_callback is not defined %}
+        {% set updatechat_callback = false %}
+    {% endif %}
+    var socketChat = io.connect('{{ node_server }}:{{ node_chat_port }}');
+
+    // Creo la connessione al socket Chat
+    socketChat.on('connect', function() {
+        {% if room is defined and alias is defined %}
+            // La connessione si apre su una chatroom predefinita
+            socketChat.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} }, {chatroom: '{{ room }}', alias: '{{ you }}'});
+        {% else %}
+            // La connessione si apre sulla chatroom default
+            socketChat.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} });
+        {% endif %}
+        // Recupero gli ultimi messaggi presenti nella chatroom
+        setTimeout(function(){socketChat.emit('previouschat');}, 250);
+    });
+
+    // Aggiorna la chat 
+    socketChat.on('updatechat', function(username, data) {
+        $('#{{ chat_body }}').append(getMessageBody(username, data));
+        {% if updatechat_callback %}
+            {{ updatechat_callback }}(username, data);
+        {% endif %}
+    });
+
+    // Recupera gli ultimi messaggi della chat
+    socketChat.on('oldchat', function(username, data) {
+        $('#{{ chat_body }}').prepend(getMessageBody(username, data));
+    });
+    
+    function getMessageBody(username, data) {
+        var html = $('#{{ chat_message }}').html();
+        html = html.replace(/\[username\]/g, username)
+                   .replace(/\[message\]/g, data.message)
+                   .replace(/\[send_at\]/g, data.send_at)
+                   .replace(/\[message_id\]/g, data.id)
+                   .replace(/\[abuse\]/g, data.abuse)
+                   ;
+       return html;
+    }
+
+    // listener, whenever the server emits 'updatechat', this updates the chat body
+    socketChat.on('updatenotice', function(username, data) {
+        $('#{{ notice_body }}').append(getNoticeBody(username, data));
+    });
+    
+    function getNoticeBody(username, data) {
+        var html = $('#{{ notice_message }}').html();
+        html = html.replace(/\[username\]/g, username)
+                   .replace(/\[message\]/g, data)
+                   .replace(/\[fadeout_at\]/g, Date.create(Date.create('now').getTime() + 60000))
+                   ;
+       return html;
+    }
+
+    // Aggiorna l'elenco delle chatroom
+    socketChat.on('updaterooms', function(rooms, current_room) {
+        $('#{{ room_body }}').empty();
+        $.each(rooms, function(key, value) {
+            console.log(value);
+            if (value.chatroom === current_room) {
+                $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+            } else {
+                $('#{{ room_body }}').html($('#{{ room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+            }
+        });
+    });
+    
+    // Aggiorna l'elenco degli utenti online
+    socketChat.on('updateusers', function(users) {
+        $('#{{ user_body }}').empty();
+        $.each(users, function(key, value) {
+            if (value !== '{{ app.user.nickname }}') {
+                $('#{{ user_body }}').append($('#{{ user_elem }}').html().replace(/\[nickname\]/g, value.nickname).replace(/\[id\]/g, value.id).replace(/\[gender\]/g, value.gender));
+            }
+        });
+    });
+
+    // Fa switch fra le chat
+    function switchRoom(room) {
+        $('#{{ chat_body }}').html('');
+        socketChat.emit('switchRoom', room);
+        setTimeout(function(){socketChat.emit('previouschat');}, 250);
+    }
+
+    // Inizializzazione dei comportamenti
+    $(function() {
+        // when the client clicks SEND
+        $('#{{ chat_prev_id }}').click(function() {
+            socketChat.emit('previouschat', 25);
+        });
+        $('#{{ chat_button_id }}').click(function() {
+            var message = $('#data').val();
+            $('#{{ chat_input_id }}').val('');
+            socketChat.emit('sendchat', message);
+            $('#{{ chat_input_id }}').focus();
+        });
+
+        // when the client hits ENTER on their keyboard
+        $('#{{ chat_input_id }}').keypress(function(e) {
+            if (e.which == 13) {
+                $(this).blur();
+                $('#{{ chat_button_id }}').focus().click();
+            }
+        });
+    });
+{% endif %}

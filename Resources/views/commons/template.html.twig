@@ -1,0 +1,25 @@
+{% if app.user %}
+    <script type="text/html" id="user_elem" tag="nickname,id,gender">
+        <div class="[gender]" title="[gender]">
+            [nickname]
+        </div>
+    </script>
+    <script type="text/html" id="room_elem" tag="alias,id">
+        <div>
+            <a href="javascript:void(0)" onclick="switchRoom('[id]')">[alias]</a>
+        </div>
+    </script>
+    <script type="text/html" id="current_room_elem" tag="alias,id">
+        <div>
+            [alias]
+        </div>
+    </script>
+    <script type="text/html" id="chat_message" tag="username,message,send_at,message_id,abuse">
+        <b title="[send_at]">[username]:</b>[message]<br>
+    </script>
+    <script type="text/html" id="notice_message" tag="username,message,fadeout_at">
+        <span class="chat_notice_message" fade_at="[fadeout_at]">
+            <b>[username]:</b>[message]<br>
+        </span>
+    </script>
+{% endif %}
