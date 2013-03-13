@@ -1,4 +1,13 @@
 {% if app.user %}
+    {% if user_class is not defined %}
+        {% set user_class = 'live_user' %}
+    {% endif %}
+    {% if user_online_class is not defined %}
+        {% set user_online_class = 'user_online' %}
+    {% endif %}
+    {% if user_offline_class is not defined %}
+        {% set user_offline_class = 'user_offline' %}
+    {% endif %}
     {% if chat_input_id is not defined %}
         {% set chat_input_id = 'data' %}
     {% endif %}
@@ -52,97 +61,112 @@
             // La connessione si apre sulla chatroom default
             socketChat.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} });
         {% endif %}
-        // Recupero gli ultimi messaggi presenti nella chatroom
-        setTimeout(function(){socketChat.emit('previouschat');}, 250);
-    });
-
-    // Aggiorna la chat 
-    socketChat.on('updatechat', function(username, data) {
-        $('#{{ chat_body }}').append(getMessageBody(username, data));
-        {% if updatechat_callback %}
-            {{ updatechat_callback }}(username, data);
+        {% if chat is defined %}
+            // Recupero gli ultimi messaggi presenti nella chatroom
+            setTimeout(function(){socketChat.emit('previouschat');}, 250);
         {% endif %}
     });
 
-    // Recupera gli ultimi messaggi della chat
-    socketChat.on('oldchat', function(username, data) {
-        $('#{{ chat_body }}').prepend(getMessageBody(username, data));
-    });
-    
-    function getMessageBody(username, data) {
-        var html = $('#{{ chat_message }}').html();
-        html = html.replace(/\[username\]/g, username)
-                   .replace(/\[message\]/g, data.message)
-                   .replace(/\[send_at\]/g, data.send_at)
-                   .replace(/\[message_id\]/g, data.id)
-                   .replace(/\[abuse\]/g, data.abuse)
-                   ;
-       return html;
-    }
-
-    // listener, whenever the server emits 'updatechat', this updates the chat body
-    socketChat.on('updatenotice', function(username, data) {
-        $('#{{ notice_body }}').append(getNoticeBody(username, data));
-    });
-    
-    function getNoticeBody(username, data) {
-        var html = $('#{{ notice_message }}').html();
-        html = html.replace(/\[username\]/g, username)
-                   .replace(/\[message\]/g, data)
-                   .replace(/\[fadeout_at\]/g, Date.create(Date.create('now').getTime() + 60000))
-                   ;
-       return html;
-    }
-
-    // Aggiorna l'elenco delle chatroom
-    socketChat.on('updaterooms', function(rooms, current_room) {
-        $('#{{ room_body }}').empty();
-        $.each(rooms, function(key, value) {
-            console.log(value);
-            if (value.chatroom === current_room) {
-                $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
-            } else {
-                $('#{{ room_body }}').html($('#{{ room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
-            }
+    {% if chat is defined %}
+        // Aggiorna la chat 
+        socketChat.on('updatechat', function(username, data) {
+            $('#{{ chat_body }}').append(getMessageBody(username, data));
+            {% if updatechat_callback %}
+                {{ updatechat_callback }}(username, data);
+            {% endif %}
         });
-    });
-    
+
+        // Recupera gli ultimi messaggi della chat
+        socketChat.on('oldchat', function(username, data) {
+            $('#{{ chat_body }}').prepend(getMessageBody(username, data));
+        });
+
+        function getMessageBody(username, data) {
+            var html = $('#{{ chat_message }}').html();
+            html = html.replace(/\[username\]/g, username)
+                       .replace(/\[message\]/g, data.message)
+                       .replace(/\[send_at\]/g, data.send_at)
+                       .replace(/\[message_id\]/g, data.id)
+                       .replace(/\[abuse\]/g, data.abuse)
+                       ;
+           return html;
+        }
+
+        // listener, whenever the server emits 'updatechat', this updates the chat body
+        socketChat.on('updatenotice', function(username, data) {
+            $('#{{ notice_body }}').append(getNoticeBody(username, data));
+        });
+
+        function getNoticeBody(username, data) {
+            var html = $('#{{ notice_message }}').html();
+            html = html.replace(/\[username\]/g, username)
+                       .replace(/\[message\]/g, data)
+                       .replace(/\[fadeout_at\]/g, Date.create(Date.create('now').getTime() + 60000))
+                       ;
+           return html;
+        }
+
+        // Aggiorna l'elenco delle chatroom
+        socketChat.on('updaterooms', function(rooms, current_room) {
+            $('#{{ room_body }}').empty();
+            $.each(rooms, function(key, value) {
+                console.log(value);
+                if (value.chatroom === current_room) {
+                    $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+                } else {
+                    $('#{{ room_body }}').html($('#{{ room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+                }
+            });
+        });
+
+        // Fa switch fra le chat
+        function switchRoom(room) {
+            $('#{{ chat_body }}').html('');
+            socketChat.emit('switchRoom', room);
+            setTimeout(function(){socketChat.emit('previouschat');}, 250);
+        }
+
+        // Inizializzazione dei comportamenti
+        $(function() {
+            // when the client clicks SEND
+            $('#{{ chat_prev_id }}').click(function() {
+                socketChat.emit('previouschat', 25);
+            });
+            $('#{{ chat_button_id }}').click(function() {
+                var message = $('#data').val();
+                $('#{{ chat_input_id }}').val('');
+                socketChat.emit('sendchat', message);
+                $('#{{ chat_input_id }}').focus();
+            });
+
+            // when the client hits ENTER on their keyboard
+            $('#{{ chat_input_id }}').keypress(function(e) {
+                if (e.which == 13) {
+                    $(this).blur();
+                    $('#{{ chat_button_id }}').focus().click();
+                }
+            });
+        });
+    {% endif %}
     // Aggiorna l'elenco degli utenti online
     socketChat.on('updateusers', function(users) {
-        $('#{{ user_body }}').empty();
+        {% if online is defined %}
+            $('.{{ user_class }}').removeClass('{{ user_online_class }}').removeClass('{{ user_offline_class }}').addClass('{{ user_offline_class }}');
+        {% endif %}
+        {% if chat is defined %}
+            $('#{{ user_body }}').empty();
+        {% endif %}
         $.each(users, function(key, value) {
-            if (value !== '{{ app.user.nickname }}') {
-                $('#{{ user_body }}').append($('#{{ user_elem }}').html().replace(/\[nickname\]/g, value.nickname).replace(/\[id\]/g, value.id).replace(/\[gender\]/g, value.gender));
-            }
-        });
-    });
-
-    // Fa switch fra le chat
-    function switchRoom(room) {
-        $('#{{ chat_body }}').html('');
-        socketChat.emit('switchRoom', room);
-        setTimeout(function(){socketChat.emit('previouschat');}, 250);
-    }
-
-    // Inizializzazione dei comportamenti
-    $(function() {
-        // when the client clicks SEND
-        $('#{{ chat_prev_id }}').click(function() {
-            socketChat.emit('previouschat', 25);
-        });
-        $('#{{ chat_button_id }}').click(function() {
-            var message = $('#data').val();
-            $('#{{ chat_input_id }}').val('');
-            socketChat.emit('sendchat', message);
-            $('#{{ chat_input_id }}').focus();
-        });
-
-        // when the client hits ENTER on their keyboard
-        $('#{{ chat_input_id }}').keypress(function(e) {
-            if (e.which == 13) {
-                $(this).blur();
-                $('#{{ chat_button_id }}').focus().click();
-            }
+            {% if online is defined %}
+                console.log($('.{{ user_class }}_'+value.id));
+                $('.{{ user_class }}_'+value.id).removeClass('{{ user_offline_class }}').addClass('{{ user_online_class }}');
+            {% endif %}
+            {% if chat is defined %}
+                if (value.nickname !== '{{ app.user.nickname }}') {
+                    $('#{{ user_body }}').append($('#{{ user_elem }}').html().replace(/\[nickname\]/g, value.nickname).replace(/\[id\]/g, value.id).replace(/\[gender\]/g, value.gender));
+                }
+            {% endif %}
         });
     });
 {% endif %}
+

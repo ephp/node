@@ -127,6 +127,7 @@ app.get('/', function(req, res) {
 
 // username degli utenti che sono in chat
 var users = {};
+var rooms = [];
 
 io.sockets.on('connection', function(socket) {
 
@@ -149,7 +150,6 @@ io.sockets.on('connection', function(socket) {
         room = room ? room : {chatroom: socket.messages.default_room, alias: socket.messages.default_room};
         // faccio entrare l'utente nella stanza default
         joinRoom(socket, room, user);
-
     });
 
     /**
@@ -212,6 +212,11 @@ io.sockets.on('connection', function(socket) {
                 console.log('SYSTEM: socket.messages.disconnect: ' + socket.messages.disconnect);
                 socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
                 socket.leave(socket.room);
+                setTimeout(function(){
+                    rooms.each(function(room){
+                        io.sockets.in(room).emit('updateusers', users);
+                    });
+                }, 250);
             }
         }, 30000);
     });
@@ -265,6 +270,11 @@ var addUser = function(socket, user) {
     getUser(user, function(out) {
         users[user] = out;
         socket.emit('updateusers', users);
+        setTimeout(function(){
+            rooms.each(function(room){
+                io.sockets.in(room).emit('updateusers', users);
+            });
+        }, 250);
     });
 };
 
@@ -296,6 +306,9 @@ var joinRoom = function(socket, chatroom, user) {
             socket.broadcast.to(socket.room).emit('updatenotice', socket.messages.server, socket.messages.exit.replace(/__nickname__/g, socket.username));
         }
         // associo la chat alla stanza
+        if(!rooms.find(out.chatroom)) {
+            rooms.add(out.chatroom);
+        }
         socket.room = out.chatroom;
         socket._room = out;
         socket.join(socket.room);

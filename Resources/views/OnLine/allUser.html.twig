@@ -1,0 +1,20 @@
+{% set notifiche_chat_off = true %}
+{% extends "::base.html.twig" %}
+{% block js_inline %}
+    {% include "EphpNodeBundle:commons:script.js.twig" with {'online': true} %}
+{% endblock %}
+{% block css_inline %}
+    .user_online {
+        border: 1px solid green !important;
+    }
+    .user_offline {
+        border: 1px solid red !important;
+    }
+{% endblock %}
+{% block content %}
+    {% for user in users %}
+        <div class="live_user live_user_{{ user.id }}">
+            {{ user.nickname }}
+        </div>
+    {% endfor %}
+{% endblock %}

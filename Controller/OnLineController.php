@@ -12,13 +12,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class OnLineController extends Controller {
 
     /**
-     * @Route("all", name="online_all")
+     * @Route("/all", name="online_all")
      * @Template()
      */
-    public function chatNotificaAction() {
-        return array();
+    public function allUserAction() {
+        $em = $this->getEm();
+        $_user = $em->getRepository($this->container->getParameter('ephp_acl.user.class'));
+        $users = $_user->findAll();
+        return array(
+            'users' => $users,
+        );
     }
-    
 
     /**
      *
