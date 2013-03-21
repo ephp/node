@@ -1,12 +1,12 @@
 chat:
   messages:
     server: | 
-      server: 'Server',
-      default_room: 'Italiano',
-      default_locale: 'it',
-      connect: 'Ciao __nickname__! Sei entrato nella chatroom __room__',
-      reconnect: 'Sei entrato nella chatroom __room__',
-      enter: '__nickname__ è entrato nella chatroom',
-      exit: '__nickname__ è uscito dalla chatroom',
-      disconnect: '__nickname__ si è disconnesso'
+      server: "Server",
+      default_room: "Italiano",
+      default_locale: "it",
+      connect: "Ciao __nickname__! Sei entrato nella chatroom __room__",
+      reconnect: "Sei entrato nella chatroom __room__",
+      enter: "__nickname__ è entrato nella chatroom",
+      exit: "__nickname__ è uscito dalla chatroom",
+      disconnect: "__nickname__ si è disconnesso"
     
