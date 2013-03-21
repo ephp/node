@@ -45,7 +45,7 @@ fs.readFile(parameters_file, 'utf8', function(err, data) {
     // Abilito il listener della chat
     chat_port = readParam(data, 'node.chat.port:', chat_port);
     server.listen(chat_port);
-    console.log('Chat enabled');
+    console.log('Chat enabled on port '+chat_port);
 
     database_host = readParam(data, 'database_host:', database_host);
     database_port = readParam(data, 'database_port:', database_port);

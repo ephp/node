@@ -1,3 +1,3 @@
 {% if app.user %}
-    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script src="{{ node_server|raw }}:{{ node_chat_port }}/socket.io/socket.io.js"></script>
 {% endif %}

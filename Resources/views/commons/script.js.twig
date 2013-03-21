@@ -1,56 +1,23 @@
 {% if app.user %}
-    {% if user_class is not defined %}
-        {% set user_class = 'live_user' %}
-    {% endif %}
-    {% if user_online_class is not defined %}
-        {% set user_online_class = 'user_online' %}
-    {% endif %}
-    {% if user_offline_class is not defined %}
-        {% set user_offline_class = 'user_offline' %}
-    {% endif %}
-    {% if chat_input_id is not defined %}
-        {% set chat_input_id = 'data' %}
-    {% endif %}
-    {% if chat_button_id is not defined %}
-        {% set chat_button_id = 'data_button' %}
-    {% endif %}
-    {% if chat_prev_id is not defined %}
-        {% set chat_prev_id = 'data_prev' %}
-    {% endif %}
-    {% if user_body is not defined %}
-        {% set user_body = 'users' %}
-    {% endif %}
-    {% if user_elem is not defined %}
-        {% set user_elem = 'user_elem' %}
-    {% endif %}
-    {% if room_body is not defined %}
-        {% set room_body = 'rooms' %}
-    {% endif %}
-    {% if room_elem is not defined %}
-        {% set room_elem = 'room_elem' %}
-    {% endif %}
-    {% if current_room_body is not defined %}
-        {% set current_room_body = 'current_room' %}
-    {% endif %}
-    {% if current_room_elem is not defined %}
-        {% set current_room_elem = 'current_room_elem' %}
-    {% endif %}
-    {% if chat_body is not defined %}
-        {% set chat_body = 'chat_messages' %}
-    {% endif %}
-    {% if chat_message is not defined %}
-        {% set chat_message = 'chat_message' %}
-    {% endif %}
-    {% if notice_body is not defined %}
-        {% set notice_body = 'notice_messages' %}
-    {% endif %}
-    {% if notice_message is not defined %}
-        {% set notice_message = 'notice_message' %}
-    {% endif %}
-    {% if updatechat_callback is not defined %}
-        {% set updatechat_callback = false %}
-    {% endif %}
-    var socketChat = io.connect('{{ node_server }}:{{ node_chat_port }}');
+    {% if user_class is not defined %}{% set user_class = 'live_user' %}{% endif %}
+    {% if user_online_class is not defined %}{% set user_online_class = 'user_online' %}{% endif %}
+    {% if user_offline_class is not defined %}{% set user_offline_class = 'user_offline' %}{% endif %}
+    {% if chat_input_id is not defined %}{% set chat_input_id = 'data' %}{% endif %}
+    {% if chat_button_id is not defined %}{% set chat_button_id = 'data_button' %}{% endif %}
+    {% if chat_prev_id is not defined %}{% set chat_prev_id = 'data_prev' %}{% endif %}
+    {% if user_body is not defined %}{% set user_body = 'users' %}{% endif %}
+    {% if user_elem is not defined %}{% set user_elem = 'user_elem' %}{% endif %}
+    {% if room_body is not defined %}{% set room_body = 'rooms' %}{% endif %}
+    {% if room_elem is not defined %}{% set room_elem = 'room_elem' %}{% endif %}
+    {% if current_room_body is not defined %}{% set current_room_body = 'current_room' %}{% endif %}
+    {% if current_room_elem is not defined %}{% set current_room_elem = 'current_room_elem' %}{% endif %}
+    {% if chat_body is not defined %}{% set chat_body = 'chat_messages' %}{% endif %}
+    {% if chat_message is not defined %}{% set chat_message = 'chat_message' %}{% endif %}
+    {% if notice_body is not defined %}{% set notice_body = 'notice_messages' %}{% endif %}
+    {% if notice_message is not defined %}{% set notice_message = 'notice_message' %}{% endif %}
+    {% if updatechat_callback is not defined %}{% set updatechat_callback = false %}{% endif %}
+
+    var socketChat = io.connect('{{ node_server|raw }}:{{ node_chat_port }}');
 
     // Creo la connessione al socket Chat
     socketChat.on('connect', function() {
