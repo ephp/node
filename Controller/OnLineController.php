@@ -18,7 +18,8 @@ class OnLineController extends Controller {
     public function allUserAction() {
         $em = $this->getEm();
         $_user = $em->getRepository($this->container->getParameter('ephp_acl.user.class'));
-        $users = $_user->findAll();
+//        $users = $_user->findAll();
+        $users = $_user->findBy(array(), array('lastLogin' => 'DESC'), 10);
         return array(
             'users' => $users,
         );

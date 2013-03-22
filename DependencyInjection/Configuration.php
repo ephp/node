@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
                     ->arrayNode('tables')
                         ->addDefaultsIfNotSet()
                         ->children()
-                            ->scalarNode('tb_user')->defaultValue('ephp_users')->cannotBeEmpty()->end()
+                            ->scalarNode('tb_users')->defaultValue('ephp_users')->cannotBeEmpty()->end()
                             ->scalarNode('tb_chat_room')->defaultValue('chat_room')->cannotBeEmpty()->end()
                             ->scalarNode('tb_chat_messages')->defaultValue('chat_messages')->cannotBeEmpty()->end()
                         ->end()

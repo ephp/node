@@ -45,7 +45,7 @@ fs.readFile(parameters_file, 'utf8', function(err, data) {
     // Abilito il listener della chat
     chat_port = readParam(data, 'node.chat.port:', chat_port);
     server.listen(chat_port);
-    console.log('Chat enabled on port '+chat_port);
+    console.log('Chat enabled on port ' + chat_port);
 
     database_host = readParam(data, 'database_host:', database_host);
     database_port = readParam(data, 'database_port:', database_port);
@@ -76,11 +76,11 @@ var readParam = function(parameters, parameter, default_value) {
             out = out.trim();
         }
     }
-    if(out.search(/^null$/i) >= 0 || out === '') {
+    if (out.search(/^null$/i) >= 0 || out === '') {
         out = default_value;
-    } else if(out.search(/^(true|yes)$/i) >= 0) {
+    } else if (out.search(/^(true|yes)$/i) >= 0) {
         out = true;
-    } else if(out.search(/^(false|no)$/i) >= 0) {
+    } else if (out.search(/^(false|no)$/i) >= 0) {
         out = false;
     }
     return out;
@@ -212,8 +212,8 @@ io.sockets.on('connection', function(socket) {
                 console.log('SYSTEM: socket.messages.disconnect: ' + socket.messages.disconnect);
                 socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
                 socket.leave(socket.room);
-                setTimeout(function(){
-                    rooms.each(function(room){
+                setTimeout(function() {
+                    rooms.each(function(room) {
                         io.sockets.in(room).emit('updateusers', users);
                     });
                 }, 250);
@@ -223,6 +223,7 @@ io.sockets.on('connection', function(socket) {
 });
 
 var sendChat = function(socket, data, callback) {
+    console.info('sendChat');
     db_pool.getConnection(function(error, connection) {
         if (error) {
             return console.log("sendChat: Connection error");
@@ -237,11 +238,11 @@ var sendChat = function(socket, data, callback) {
         };
         connection.query('INSERT INTO ' + tb_chat_messages + ' SET ?', chat, function(err, rows) {
             if (err) {
-                return console.log("sendChat: "+err);
+                return console.log("sendChat: " + err);
             }
             connection.query('UPDATE ' + tb_chat_room + ' SET last_message_at = ' + connection.escape(Date.create('now')) + ' WHERE id = ' + connection.escape(socket._room.id), function(err, rows) {
                 if (err) {
-                    return console.log("sendChat: "+err);
+                    return console.log("sendChat: " + err);
                 }
                 connection.end();
                 callback(chat);
@@ -251,27 +252,31 @@ var sendChat = function(socket, data, callback) {
 };
 
 var prevChat = function(socket, from, limit, callback) {
-    db_pool.getConnection(function(error, connection) {
-        if (error) {
-            return console.log("prevChat: Connection error");
-        }
-        connection.query('SELECT m.*, u.nickname FROM ' + tb_chat_messages + ' m, ' + tb_users + ' u WHERE m.user_id = u.id AND m.chatroom_id = ' + connection.escape(socket._room.id) + ' ORDER BY m.send_at DESC LIMIT ' + from + ',' + limit, function(err, rows) {
-            if (err) {
-                return console.log("prevChat: "+err);
+    console.info('prevChat');
+    if (socket._room) {
+        db_pool.getConnection(function(error, connection) {
+            if (error) {
+                return console.log("prevChat: Connection error");
             }
-            connection.end();
-            callback(rows);
+            connection.query('SELECT m.*, u.nickname FROM ' + tb_chat_messages + ' m, ' + tb_users + ' u WHERE m.user_id = u.id AND m.chatroom_id = ' + connection.escape(socket._room.id) + ' ORDER BY m.send_at DESC LIMIT ' + from + ',' + limit, function(err, rows) {
+                if (err) {
+                    return console.log("prevChat: " + err);
+                }
+                connection.end();
+                callback(rows);
+            });
         });
-    });
+    }
 };
 
 
 var addUser = function(socket, user) {
+    console.info('addUser');
     getUser(user, function(out) {
         users[user] = out;
         socket.emit('updateusers', users);
-        setTimeout(function(){
-            rooms.each(function(room){
+        setTimeout(function() {
+            rooms.each(function(room) {
                 io.sockets.in(room).emit('updateusers', users);
             });
         }, 250);
@@ -279,13 +284,14 @@ var addUser = function(socket, user) {
 };
 
 var getUser = function(user, callback) {
+    console.info('getUser');
     db_pool.getConnection(function(error, connection) {
         if (error) {
             return console.log("getUser: Connection error");
         }
         connection.query('SELECT id, nickname, gender, roles FROM ' + tb_users + ' WHERE nickname = ' + connection.escape(user), function(err, rows) {
             if (err) {
-                return console.log("getUser: "+err);
+                return console.log("getUser: " + err);
             }
             rows.each(function(row) {
                 // aggiungo l'username del client all'elenco degli utenti attivi
@@ -297,6 +303,7 @@ var getUser = function(user, callback) {
 };
 
 var joinRoom = function(socket, chatroom, user) {
+    console.info('joinRoom');
     // memorizzo la stanza
     getChatroom(socket, chatroom, user, function(out) {
         if (chatroom.id) {
@@ -306,7 +313,7 @@ var joinRoom = function(socket, chatroom, user) {
             socket.broadcast.to(socket.room).emit('updatenotice', socket.messages.server, socket.messages.exit.replace(/__nickname__/g, socket.username));
         }
         // associo la chat alla stanza
-        if(!rooms.find(out.chatroom)) {
+        if (!rooms.find(out.chatroom)) {
             rooms.add(out.chatroom);
         }
         socket.room = out.chatroom;
@@ -326,6 +333,7 @@ var joinRoom = function(socket, chatroom, user) {
 };
 
 var getChatroom = function(socket, room, user, callback) {
+    console.info('getChatroom');
     var out = null;
     db_pool.getConnection(function(error, connection) {
         if (error) {
@@ -334,7 +342,7 @@ var getChatroom = function(socket, room, user, callback) {
         var query = room.chatroom ? 'SELECT * FROM ' + tb_chat_room + ' WHERE chatroom = ' + connection.escape(room.chatroom) : 'SELECT * FROM ' + tb_chat_room + ' WHERE id = ' + connection.escape(room.id);
         connection.query(query, function(err, rows) {
             if (err) {
-                return console.log("getChatroom: "+err);
+                return console.log("getChatroom: " + err);
             }
             rows.each(function(row) {
                 out = row;
@@ -350,11 +358,11 @@ var getChatroom = function(socket, room, user, callback) {
                 };
                 connection.query('INSERT INTO ' + tb_chat_room + ' SET ?', chatroom, function(err, rows) {
                     if (err) {
-                        return console.log("getChatroom: "+err);
+                        return console.log("getChatroom: " + err);
                     }
                     connection.query('SELECT * FROM ' + tb_chat_room + ' WHERE chatroom = ' + connection.escape(room), function(err, rows) {
                         if (err) {
-                            return console.log("getChatroom: "+err);
+                            return console.log("getChatroom: " + err);
                         }
                         rows.each(function(row) {
                             out = row;
@@ -371,7 +379,7 @@ var getChatroom = function(socket, room, user, callback) {
                     my_chatroom_alias.add(room.alias);
                     connection.query('UPDATE ' + tb_chat_room + ' SET users = ' + connection.escape(array_dc2type(my_chatroom_user)) + ', alias = ' + connection.escape(array_dc2type(my_chatroom_alias)) + ' WHERE id = ' + connection.escape(out.id), function(err, rows) {
                         if (err) {
-                            return console.log("getChatroom: "+err);
+                            return console.log("getChatroom: " + err);
                         }
                         connection.end();
                         callback(out);
@@ -386,6 +394,7 @@ var getChatroom = function(socket, room, user, callback) {
 };
 
 var getUserRooms = function(socket, user, pag) {
+    console.info('getUserRooms');
     db_pool.getConnection(function(error, connection) {
         if (error) {
             return console.log("getUserRooms: Connection error");
@@ -407,7 +416,7 @@ var getUserRooms = function(socket, user, pag) {
         query = query.to(query.length - 4) + " ORDER BY c.last_message_at DESC";
         connection.query(query, function(err, rows) {
             if (err) {
-                return console.log("getUserRooms: "+err);
+                return console.log("getUserRooms: " + err);
             }
             socket.rooms = [];
             rows.each(function(row) {
