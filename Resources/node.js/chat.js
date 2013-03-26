@@ -162,7 +162,6 @@ io.sockets.on('connection', function(socket) {
         // invia il messaggio di chat alla stanza tramite il comando 'updatechat'
         sendChat(socket, data, function(out) {
             io.sockets.in(socket.room).emit('updatechat', socket.username, out);
-            io.sockets.in(socket.room).previousfrom++;
         });
     });
 
@@ -181,7 +180,7 @@ io.sockets.on('connection', function(socket) {
         prevChat(socket, socket.previousfrom, n, function(out) {
             out.each(function(row) {
                 socket.emit('oldchat', row.nickname, row);
-                socket.previousfrom++;
+                socket.previousfrom = row.send_at;
             });
         });
     });
@@ -259,7 +258,13 @@ var prevChat = function(socket, from, limit, callback) {
             if (error) {
                 return console.log("prevChat: Connection error");
             }
-            connection.query('SELECT m.*, u.nickname FROM ' + tb_chat_messages + ' m, ' + tb_users + ' u WHERE m.user_id = u.id AND m.chatroom_id = ' + connection.escape(socket._room.id) + ' ORDER BY m.send_at DESC LIMIT ' + from + ',' + limit, function(err, rows) {
+            var query = 'SELECT m.*, u.nickname FROM ' + tb_chat_messages + ' m, ' + tb_users + ' u WHERE m.user_id = u.id AND m.chatroom_id = ' + connection.escape(socket._room.id)
+            if(from === 0) {
+                 query += ' ORDER BY m.send_at DESC LIMIT ' + limit;
+            } else {
+                 query += ' AND m.send_at < ' + connection.escape(from) + ' ORDER BY m.send_at DESC LIMIT ' + limit;
+            }
+            connection.query(query, function(err, rows) {
                 if (err) {
                     return console.log("prevChat: " + err);
                 }
