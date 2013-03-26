@@ -109,7 +109,7 @@ var array_dc2type = function(data) {
 
 var dc2type_array = function(data) {
     out = [];
-    data = data.replace(/(a|s|i):[0-9]+(:|;)/g, '').replace(/\{/, '[').replace(/;\}/, ']').replace(/;/, ',');
+    data = data.replace(/(a|s|i):[0-9]+(:|;)/g, '').replace(/\{/g, '[').replace(/;\}/g, ']').replace(/;/g, ',');
     return eval(data);
 };
 
@@ -162,6 +162,7 @@ io.sockets.on('connection', function(socket) {
         // invia il messaggio di chat alla stanza tramite il comando 'updatechat'
         sendChat(socket, data, function(out) {
             io.sockets.in(socket.room).emit('updatechat', socket.username, out);
+            io.sockets.in(socket.room).previousfrom++;
         });
     });
 
