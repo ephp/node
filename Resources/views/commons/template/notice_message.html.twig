@@ -1,0 +1,7 @@
+{% if app.user %}
+    <script type="text/html" id="notice_message" tag="username,message,fadeout_at">
+        <span class="chat_notice_message fadeout" fade_at="[fadeout_at]">
+            <b>[username]:</b>[message]<br>
+        </span>
+    </script>
+{% endif %}

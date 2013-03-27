@@ -19,9 +19,9 @@
     {% if notify_body is not defined %}{% set notify_body = 'notifiche_messages' %}{% endif %}
     {% if notify_message is not defined %}{% set notify_message = 'notifiche_message' %}{% endif %}
     {% if updatechat_callback is not defined %}{% set updatechat_callback = false %}{% endif %}
-    $(document).ready(function(){
-        var socketChat = io.connect('{{ node_server|raw }}:{{ node_chat_port|raw }}');
 
+    var socketChat = io.connect('{{ node_server|raw }}:{{ node_chat_port|raw }}');
+    $(document).ready(function(){
         {% include "EphpNodeBundle:commons:script/connect.js.twig" %}
 
         {% include "EphpNodeBundle:commons:script/getMessageBody.js.twig" %}
@@ -33,6 +33,7 @@
         {% include "EphpNodeBundle:commons:script/updatechat.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updatenotice.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updatenotify.js.twig" %}
+        {% include "EphpNodeBundle:commons:script/updateroomdetail.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updaterooms.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updateusers.js.twig" %}
 

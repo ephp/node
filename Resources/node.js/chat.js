@@ -218,6 +218,29 @@ io.sockets.on('connection', function(socket) {
         // effettua lo switch
         joinRoom(socket, newroom, socket.username, true);
     });
+    
+    /**
+     * emits 'chatDetail'
+     * 
+     * Permette di visualizzare i dettagli di una stanza
+     * @var roomid id della stanza richiesta
+     */
+    socket.on('chatDetail', function(roomid) {
+        // effettua lo switch
+        getChatroom(socket, {id: roomid}, socket.username, function(room){
+            var chat_users = dc2type_array(room['users']);
+            room['alias'] = dc2type_array(room['alias']);
+            room['users'] = [];
+            chat_users.each(function(chat_user){
+                getUser(chat_user, function(user) {
+                    room['users'].add(user);
+                    if(room['users'].length === chat_users.length) {
+                        socket.emit('updateroomdetail', room);
+                    }
+                });
+            });
+        });
+    });
 
     /**
      * emits 'disconnect'
@@ -386,12 +409,19 @@ var getChatroom = function(socket, room, user, callback) {
                 out = row;
             });
             if (out === null) {
+                var chat_private = room.chatroom !== socket.messages.default_room;
+                var chat_user = [user];
+                var chat_alias = [room.alias];
+                if(chat_private) {
+                    chat_user.add(room.alias);
+                    chat_alias.add(user);
+                }
                 chatroom = {
                     id: guid(),
                     chatroom: room.chatroom,
-                    private: room.chatroom !== socket.messages.default_room,
-                    users: array_dc2type([user]),
-                    alias: array_dc2type([room.alias]),
+                    private: chat_private,
+                    users: array_dc2type(chat_user),
+                    alias: array_dc2type(chat_alias),
                     locale: socket.messages.default_locale
                 };
                 connection.query('INSERT INTO ' + tb_chat_room + ' SET ?', chatroom, function(err, rows) {
