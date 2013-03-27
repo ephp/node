@@ -104,7 +104,6 @@ var array_dc2type = function(data) {
         inner += 'i:' + i + ';s:' + elem.length + ':"' + elem + '";';
         i++;
     });
-    console.log('a:' + data.length + ':{' + inner + '}');
     return 'a:' + data.length + ':{' + inner + '}';
 };
 
@@ -278,7 +277,7 @@ var prevChat = function(socket, from, limit, callback) {
             if (error) {
                 return console.log("prevChat: Connection error");
             }
-            var query = 'SELECT m.*, u.nickname FROM ' + tb_chat_messages + ' m, ' + tb_users + ' u WHERE m.user_id = u.id AND m.chatroom_id = ' + connection.escape(socket._room.id)
+            var query = 'SELECT m.*, u.nickname FROM ' + tb_chat_messages + ' m, ' + tb_users + ' u WHERE m.user_id = u.id AND m.chatroom_id = ' + connection.escape(socket._room.id);
             if(from === 0) {
                  query += ' ORDER BY m.send_at DESC LIMIT ' + limit;
             } else {
