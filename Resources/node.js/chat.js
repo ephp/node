@@ -8,6 +8,7 @@ var express = require('express')
         ;
 
 var chat_port = 0;
+var server_number = 0;
 var database_host = '127.0.0.1';
 var database_port = 3306;
 var database_name = 'node_db';
@@ -46,12 +47,16 @@ fs.readFile(parameters_file, 'utf8', function(err, data) {
     chat_port = readParam(data, 'node.chat.port:', chat_port);
     server.listen(chat_port);
     console.log('Chat enabled on port ' + chat_port);
+    
+    server_number = readParam(data, 'server_number:', server_number);
+    console.log('Server number ' + server_number);
 
     database_host = readParam(data, 'database_host:', database_host);
     database_port = readParam(data, 'database_port:', database_port);
     database_name = readParam(data, 'database_name:', database_name);
     database_user = readParam(data, 'database_user:', database_user);
     database_password = readParam(data, 'database_password:', database_password);
+    
 
     db_pool = mysql.createPool({
         database: database_name,
@@ -114,7 +119,8 @@ var dc2type_array = function(data) {
 };
 
 var guid = function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var dataHex = Date.create('now').getTime().toString(16);
+    return dataHex.to(8)+'-'+server_number+dataHex.from(8)+'-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c === 'x' ? r : r & 0x3 | 0x8;
         return v.toString(16);
     });
