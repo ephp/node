@@ -1,0 +1,9 @@
+{% if chat is defined %}
+    {# Aggiorna la chat #}
+    socketChat.on('updatechat', function(username, data) {
+        $('#{{ chat_body }}').append(getMessageBody(username, data));
+        {% if updatechat_callback %}
+            {{ updatechat_callback }}(username, data);
+        {% endif %}
+    });
+{% endif %}

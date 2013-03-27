@@ -1,0 +1,14 @@
+{% if chat is defined %}
+    {# Aggiorna l'elenco delle chatroom #}
+    socketChat.on('updaterooms', function(rooms, current_room) {
+        $('#{{ room_body }}').empty();
+        $.each(rooms, function(key, value) {
+            console.log(value);
+            if (value.chatroom === current_room) {
+                $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+            } else {
+                $('#{{ room_body }}').html($('#{{ room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+            }
+        });
+    });
+{% endif %}

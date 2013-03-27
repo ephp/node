@@ -1,0 +1,8 @@
+{% if chat is defined %}
+    {# Fa switch fra le chat #}
+    function switchRoom(room) {
+        $('#{{ chat_body }}').html('');
+        socketChat.emit('switchRoom', room);
+        setTimeout(function(){socketChat.emit('previouschat');}, 250);
+    }
+{% endif %}

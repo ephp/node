@@ -1,0 +1,11 @@
+{% if chat is defined %}
+    {# Fa il parse del messaggio di notice #}
+    function getNoticeBody(username, data) {
+        var html = $('#{{ notice_message }}').html();
+        html = html.replace(/\[username\]/g, username)
+                   .replace(/\[message\]/g, data)
+                   .replace(/\[fadeout_at\]/g, Date.create(Date.create('now').getTime() + 60000))
+                   ;
+       return html;
+    }
+{% endif %}

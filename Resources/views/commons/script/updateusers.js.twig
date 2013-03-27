@@ -1,0 +1,20 @@
+{# Aggiorna l'elenco degli utenti online #}
+socketChat.on('updateusers', function(users) {
+    {% if online is defined %}
+        $('.{{ user_class }}').removeClass('{{ user_online_class }}').removeClass('{{ user_offline_class }}').addClass('{{ user_offline_class }}');
+    {% endif %}
+    {% if chat is defined %}
+        $('#{{ user_body }}').empty();
+    {% endif %}
+    $.each(users, function(key, value) {
+        {% if online is defined %}
+            console.log($('.{{ user_class }}_'+value.id));
+            $('.{{ user_class }}_'+value.id).removeClass('{{ user_offline_class }}').addClass('{{ user_online_class }}');
+        {% endif %}
+        {% if chat is defined %}
+            if (value.nickname !== '{{ app.user.nickname }}') {
+                $('#{{ user_body }}').append($('#{{ user_elem }}').html().replace(/\[nickname\]/g, value.nickname).replace(/\[id\]/g, value.id).replace(/\[gender\]/g, value.gender));
+            }
+        {% endif %}
+    });
+});

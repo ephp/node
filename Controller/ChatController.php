@@ -20,7 +20,7 @@ class ChatController extends Controller {
     }
     
     /**
-     * @Route("/{chiama}/{risponde}", name="chat_2")
+     * @Route("/{chiama}/{risponde}", name="chat_2", defaults={"_format"="html"} ,requirements={"_format"="html|json"})
      * @Template()
      */
     public function chatDueAction($chiama, $risponde) {
@@ -32,11 +32,18 @@ class ChatController extends Controller {
         if($nickname != $chiama && $nickname != $risponde) {
             throw $this->createNotFoundException();
         }
-        return array(
+        
+        $out = array(
             'i' => $nickname == $chiama ? $chiama : $risponde,
-            'you' => $nickname == $risponde ? $chiama : $risponde,
-            'room' => $this->getChatRoomName(array($chiama, $risponde)),
+            'alias' => $nickname == $risponde ? $chiama : $risponde,
+            'chatroom' => $this->getChatRoomName(array($chiama, $risponde)),
         );
+        
+        if ($this->getRequest()->get('_format') == 'txt') {
+            return $out;
+        } else {
+            return new \Symfony\Component\HttpFoundation\Response(json_encode($out));
+        }
     }
     
     private function getChatRoomName(array $nicknames) {

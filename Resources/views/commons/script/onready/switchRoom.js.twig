@@ -1,0 +1,6 @@
+{% if chat is defined %}
+    {# Abilita lo switch fra le stanze #}
+    $('.{{ chat_room_class }}').click(function() {
+        switchRoom(JSON.parse($(this).attr('room')));
+    });
+{% endif %}

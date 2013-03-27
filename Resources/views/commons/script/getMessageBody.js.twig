@@ -1,0 +1,14 @@
+{% if chat is defined %}
+    {# Fa il parse del messaggio inviato #}
+    function getMessageBody(username, data) {
+        var html = $('#{{ chat_message }}').html();
+        html = html.replace(/\[username\]/g, username)
+                   .replace(/\[message\]/g, data.message)
+                   .replace(/\[send_at\]/g, data.send_at)
+                   .replace(/\[message_id\]/g, data.id)
+                   .replace(/\[abuse\]/g, data.abuse)
+                   .replace(/\[user_id\]/g, data.user_id)
+                   ;
+       return html;
+    }
+{% endif %}

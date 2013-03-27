@@ -104,6 +104,7 @@ var array_dc2type = function(data) {
         inner += 'i:' + i + ';s:' + elem.length + ':"' + elem + '";';
         i++;
     });
+    console.log('a:' + data.length + ':{' + inner + '}');
     return 'a:' + data.length + ':{' + inner + '}';
 };
 
@@ -128,6 +129,9 @@ app.get('/', function(req, res) {
 // username degli utenti che sono in chat
 var users = {};
 var rooms = [];
+var users_room = {};
+var room_users = {};
+var notify = {};
 
 io.sockets.on('connection', function(socket) {
 
@@ -149,7 +153,7 @@ io.sockets.on('connection', function(socket) {
         // memorizzo la stanza di default nella sessione del socket associata al client
         room = room ? room : {chatroom: socket.messages.default_room, alias: socket.messages.default_room};
         // faccio entrare l'utente nella stanza default
-        joinRoom(socket, room, user);
+        joinRoom(socket, room, user, false);
     });
 
     /**
@@ -162,6 +166,20 @@ io.sockets.on('connection', function(socket) {
         // invia il messaggio di chat alla stanza tramite il comando 'updatechat'
         sendChat(socket, data, function(out) {
             io.sockets.in(socket.room).emit('updatechat', socket.username, out);
+            if(socket._room.private === 1) {
+                room_users[socket.room].each(function(user) {
+                    if(users_room[user] !== socket.room) {
+                        if(!notify[user]) {
+                            notify[user] = {};
+                        }
+                        if(!notify[user][socket.room]) {
+                            notify[user][socket.room] = 0;
+                        }
+                        notify[user][socket.room]++;
+                        io.sockets.in(users_room[user]).emit('updatenotify', socket.username, notify[user][socket.room], out);
+                    }
+                });
+            }
         });
     });
 
@@ -193,7 +211,7 @@ io.sockets.on('connection', function(socket) {
      */
     socket.on('switchRoom', function(newroom) {
         // effettua lo switch
-        joinRoom(socket, {id: newroom}, socket.username);
+        joinRoom(socket, newroom, socket.username, true);
     });
 
     /**
@@ -211,6 +229,8 @@ io.sockets.on('connection', function(socket) {
                 // notifico l'evento'
                 console.log('SYSTEM: socket.messages.disconnect: ' + socket.messages.disconnect);
                 socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
+                delete users_room[socket.username];
+                room_users[socket.room].remove(socket.username);
                 socket.leave(socket.room);
                 setTimeout(function() {
                     rooms.each(function(room) {
@@ -308,12 +328,14 @@ var getUser = function(user, callback) {
     });
 };
 
-var joinRoom = function(socket, chatroom, user) {
+var joinRoom = function(socket, chatroom, user, switch_room) {
     console.info('joinRoom');
     // memorizzo la stanza
     getChatroom(socket, chatroom, user, function(out) {
-        if (chatroom.id) {
+        if (switch_room) {
             // l'utente esce dalla stanza precedente
+            delete users_room[socket.username];
+            room_users[socket.room].remove(socket.username);
             socket.leave(socket.room);
             // invio le notifiche
             socket.broadcast.to(socket.room).emit('updatenotice', socket.messages.server, socket.messages.exit.replace(/__nickname__/g, socket.username));
@@ -321,12 +343,17 @@ var joinRoom = function(socket, chatroom, user) {
         // associo la chat alla stanza
         if (!rooms.find(out.chatroom)) {
             rooms.add(out.chatroom);
+            room_users[out.chatroom] = [];
         }
         socket.room = out.chatroom;
         socket._room = out;
         socket.join(socket.room);
+        users_room[socket.username] = out.chatroom;
+        if (!room_users[out.chatroom].find(socket.username)) {
+            room_users[out.chatroom].add(socket.username);
+        }
         // messaggio di benvenuto
-        if (chatroom.id) {
+        if (switch_room) {
             socket.emit('updatenotice', socket.messages.server, socket.messages.reconnect.replace(/__room__/g, socket.room));
         } else {
             socket.emit('updatenotice', socket.messages.server, socket.messages.connect.replace(/__nickname__/g, socket.username).replace(/__room__/g, socket.room));
@@ -345,7 +372,7 @@ var getChatroom = function(socket, room, user, callback) {
         if (error) {
             return console.log("getChatroom: Connection error");
         }
-        var query = room.chatroom ? 'SELECT * FROM ' + tb_chat_room + ' WHERE chatroom = ' + connection.escape(room.chatroom) : 'SELECT * FROM ' + tb_chat_room + ' WHERE id = ' + connection.escape(room.id);
+        var query = room.id ? 'SELECT * FROM ' + tb_chat_room + ' WHERE id = ' + connection.escape(room.id) : 'SELECT * FROM ' + tb_chat_room + ' WHERE chatroom = ' + connection.escape(room.chatroom);
         connection.query(query, function(err, rows) {
             if (err) {
                 return console.log("getChatroom: " + err);
@@ -366,7 +393,7 @@ var getChatroom = function(socket, room, user, callback) {
                     if (err) {
                         return console.log("getChatroom: " + err);
                     }
-                    connection.query('SELECT * FROM ' + tb_chat_room + ' WHERE chatroom = ' + connection.escape(room), function(err, rows) {
+                    connection.query('SELECT * FROM ' + tb_chat_room + ' WHERE chatroom = ' + connection.escape(room.chatroom), function(err, rows) {
                         if (err) {
                             return console.log("getChatroom: " + err);
                         }

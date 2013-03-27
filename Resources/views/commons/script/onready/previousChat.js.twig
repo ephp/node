@@ -1,0 +1,6 @@
+{% if chat is defined %}
+    {# Trigger per recuperare messaggi precedenti #}
+    $('#{{ chat_prev_id }}').click(function() {
+        socketChat.emit('previouschat', 25);
+    });
+{% endif %}

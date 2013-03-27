@@ -1,0 +1,14 @@
+{# Creo la connessione al socket Chat #}
+socketChat.on('connect', function() {
+    {% if room is defined and alias is defined %}
+        // La connessione si apre su una chatroom predefinita
+        socketChat.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} }, {chatroom: '{{ chatroom }}', alias: '{{ alias }}'});
+    {% else %}
+        // La connessione si apre sulla chatroom default
+        socketChat.emit('adduser', '{{ app.user.nickname }}', { {{ 'chat.messages.server'|trans({}, 'EphpNodeChat')|raw }} });
+    {% endif %}
+    {% if chat is defined %}
+        // Recupero gli ultimi messaggi presenti nella chatroom
+        setTimeout(function(){socketChat.emit('previouschat');}, 250);
+    {% endif %}
+});

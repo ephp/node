@@ -1,5 +1,4 @@
 <?php
-
 namespace Ephp\NodeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

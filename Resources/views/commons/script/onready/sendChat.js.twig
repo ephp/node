@@ -1,0 +1,9 @@
+{% if chat is defined %}
+    {# Trigger per inviare un nuovo messaggio di chat #}
+    $('#{{ chat_button_id }}').click(function() {
+        var message = $('#data').val();
+        $('#{{ chat_input_id }}').val('');
+        socketChat.emit('sendchat', message);
+        $('#{{ chat_input_id }}').focus();
+    })
+{% endif %}

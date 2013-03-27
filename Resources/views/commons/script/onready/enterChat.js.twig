@@ -1,0 +1,9 @@
+{% if chat is defined %}
+    {# Trigger sull'invio della chat da tastiera #}
+    $('#{{ chat_input_id }}').keypress(function(e) {
+        if (e.which == 13) {
+            $(this).blur();
+            $('#{{ chat_button_id }}').focus().click();
+        }
+    });
+{% endif %}

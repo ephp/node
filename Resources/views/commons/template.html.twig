@@ -14,10 +14,15 @@
             [alias]
         </div>
     </script>
-    <script type="text/html" id="chat_message" tag="username,message,send_at,message_id,abuse">
+    <script type="text/html" id="chat_message" tag="username,message,send_at,message_id,abuse,user_id">
         <b title="[send_at]">[username]:</b>[message]<br>
     </script>
     <script type="text/html" id="notice_message" tag="username,message,fadeout_at">
+        <span class="chat_notice_message" fade_at="[fadeout_at]">
+            <b>[username]:</b>[message]<br>
+        </span>
+    </script>
+    <script type="text/html" id="notify_message" tag="username,message,fadeout_at">
         <span class="chat_notice_message" fade_at="[fadeout_at]">
             <b>[username]:</b>[message]<br>
         </span>

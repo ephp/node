@@ -1,0 +1,7 @@
+{% if chat is defined %}
+    {# Aggiorna i messaggi di notifica #}
+    notify_open = false;
+    socketChat.on('updatenotify', function(username, n, data) {
+        $('#{{ notify_body }}').append(getNotifyBody(username, n, data));
+    });
+{% endif %}

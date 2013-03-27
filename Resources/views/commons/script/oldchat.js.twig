@@ -1,0 +1,6 @@
+{% if chat is defined %}
+    {# Recupera gli ultimi messaggi della chat #}
+    socketChat.on('oldchat', function(username, data) {
+        $('#{{ chat_body }}').prepend(getMessageBody(username, data));
+    });
+{% endif %}
