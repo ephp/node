@@ -17,8 +17,8 @@
     {% if chat_message is not defined %}{% set chat_message = 'chat_message' %}{% endif %}
     {% if notice_body is not defined %}{% set notice_body = 'notice_messages' %}{% endif %}
     {% if notice_message is not defined %}{% set notice_message = 'notice_message' %}{% endif %}
-    {% if notify_body is not defined %}{% set notify_body = 'notifiche_messages' %}{% endif %}
-    {% if notify_message is not defined %}{% set notify_message = 'notifiche_message' %}{% endif %}
+    {% if notify_body is not defined %}{% set notify_body = 'notify_messages' %}{% endif %}
+    {% if notify_message is not defined %}{% set notify_message = 'notify_message' %}{% endif %}
     {% if updatechat_callback is not defined %}{% set updatechat_callback = false %}{% endif %}
 
     var socketChat = io.connect('{{ node_server|raw }}:{{ node_chat_port|raw }}');

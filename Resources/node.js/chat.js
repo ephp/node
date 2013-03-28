@@ -135,6 +135,7 @@ app.get('/', function(req, res) {
 var users = {};
 var rooms = [];
 var users_room = {};
+var users_socket = {};
 var room_users = {};
 var notify = {};
 
@@ -159,6 +160,8 @@ io.sockets.on('connection', function(socket) {
         room = room ? room : {chatroom: socket.messages.default_room, alias: socket.messages.default_room};
         // faccio entrare l'utente nella stanza default
         joinRoom(socket, room, user, false);
+        //Memorizzo il socket dell'utente
+        users_socket[user] = socket;
     });
 
     /**
@@ -172,7 +175,10 @@ io.sockets.on('connection', function(socket) {
         sendChat(socket, data, function(out) {
             io.sockets.in(socket.room).emit('updatechat', socket.username, out);
             if (socket._room.private === 1) {
-                room_users[socket.room].each(function(user) {
+                console.log(socket._room);
+                var chat_users = dc2type_array(socket._room.users);
+                console.log(chat_users);
+                chat_users.each(function(user) {
                     if (users_room[user] !== socket.room) {
                         if (!notify[user]) {
                             notify[user] = {};
@@ -181,7 +187,7 @@ io.sockets.on('connection', function(socket) {
                             notify[user][socket.room] = 0;
                         }
                         notify[user][socket.room]++;
-                        io.sockets.in(users_room[user]).emit('updatenotify', socket.username, notify[user][socket.room], out);
+                        users_socket[user].emit('updatenotify', users[socket.username], notify[user][socket.room], out);
                     }
                 });
             }
@@ -197,7 +203,12 @@ io.sockets.on('connection', function(socket) {
     socket.on('previouschat', function(n) {
         // Recupera gli ultimi messaggi della stanza
         if (!n) {
-            n = 5;
+            if(notify[socket.username] && notify[socket.username][socket.room]) {
+                n = notify[socket.username][socket.room];
+                notify[socket.username][socket.room] = 0;
+            } else {
+                n = 5;
+            }
             socket.previousfrom = 0;
         }
         prevChat(socket, socket.previousfrom, n, function(out) {
@@ -216,32 +227,11 @@ io.sockets.on('connection', function(socket) {
      */
     socket.on('switchRoom', function(newroom) {
         // effettua lo switch
-        var my_chatroom = newroom.chatroom;
-        newroom.chatroom = my_chatroom.sortBy().toString();
+        if(newroom.chatroom) {
+            var my_chatroom = newroom.chatroom;
+            newroom.chatroom = my_chatroom.sortBy().toString();
+        }
         joinRoom(socket, newroom, socket.username, true);
-    });
-
-    /**
-     * emits 'chatDetail'
-     * 
-     * Permette di visualizzare i dettagli di una stanza
-     * @var roomid id della stanza richiesta
-     */
-    socket.on('chatDetail', function(roomid) {
-        // effettua lo switch
-        getChatroom(socket, {id: roomid}, socket.username, function(room) {
-            var chat_users = dc2type_array(room['users']);
-            room['alias'] = dc2type_array(room['alias']);
-            room['users'] = [];
-            chat_users.each(function(chat_user) {
-                getUser(chat_user, function(user) {
-                    room['users'].add(user);
-                    if (room['users'].length === chat_users.length) {
-                        socket.emit('updateroomdetail', room);
-                    }
-                });
-            });
-        });
     });
 
     /**
@@ -252,11 +242,13 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function() {
         // remuovo l'utente dalla chat
         delete users[socket.username];
+        delete users_socket[socket.username];
         setTimeout(function() {
             if (!users[socket.username]) {
                 // aggiorno l'elenco utenti
                 io.sockets.emit('updateusers', users);
                 // notifico l'evento'
+                console.log(socket.messages);
                 socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
                 delete users_room[socket.username];
                 room_users[socket.room].remove(socket.username);

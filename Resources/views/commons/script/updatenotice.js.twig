@@ -1,6 +1,6 @@
 {% if chat is defined %}
     {# Aggiorna le notifiche #}
     socketChat.on('updatenotice', function(username, data) {
-        $('#{{ notice_body }}').append(getNoticeBody(username, data));
+        $('#{{ notice_body }}').prepend(getNoticeBody(username, data));
     });
 {% endif %}

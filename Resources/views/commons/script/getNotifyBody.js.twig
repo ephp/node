@@ -1,11 +1,15 @@
 {% if chat is defined %}
     {# Fa il parse del messaggio di notifica #}
-    function getNotifyBody(username, n, data) {
+    function getNotifyBody(user, n, data) {
         var html = $('#{{ notify_message }}').html();
-        html = html.replace(/\[username\]/g, username)
+        html = html.replace(/\[username\]/g, user.nickname)
+                   .replace(/\[user_id\]/g, user.id)
                    .replace(/\[number\]/g, n)
+                   .replace(/\[message\]/g, data.message)
+                   .replace(/\[chatroom_id\]/g, data.chatroom_id)
                    .replace(/\[fadeout_at\]/g, Date.create(Date.create('now').getTime() + 60000))
                    ;
+       console.log(html);
        return html;
     }
 {% endif %}
