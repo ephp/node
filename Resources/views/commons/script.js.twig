@@ -9,9 +9,10 @@
     {% if user_body is not defined %}{% set user_body = 'users' %}{% endif %}
     {% if user_elem is not defined %}{% set user_elem = 'user_elem' %}{% endif %}
     {% if room_body is not defined %}{% set room_body = 'rooms' %}{% endif %}
-    {% if room_elem is not defined %}{% set room_elem = 'room_elem' %}{% endif %}
-    {% if current_room_body is not defined %}{% set current_room_body = 'current_room' %}{% endif %}
+    {% if private_room_elem is not defined %}{% set private_room_elem = 'private_room_elem' %}{% endif %}
+    {% if public_room_elem is not defined %}{% set public_room_elem = 'public_room_elem' %}{% endif %}
     {% if current_room_elem is not defined %}{% set current_room_elem = 'current_room_elem' %}{% endif %}
+    {% if current_room_body is not defined %}{% set current_room_body = 'current_room' %}{% endif %}
     {% if chat_body is not defined %}{% set chat_body = 'chat_messages' %}{% endif %}
     {% if chat_message is not defined %}{% set chat_message = 'chat_message' %}{% endif %}
     {% if notice_body is not defined %}{% set notice_body = 'notice_messages' %}{% endif %}
@@ -32,7 +33,6 @@
         {% include "EphpNodeBundle:commons:script/updatechat.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updatenotice.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updatenotify.js.twig" %}
-        {% include "EphpNodeBundle:commons:script/updateroomdetail.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updaterooms.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updateusers.js.twig" %}
 

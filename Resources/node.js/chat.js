@@ -476,7 +476,7 @@ var getUserRooms = function(socket, user, pag) {
         var query_part = [];
         var query = "SELECT * FROM " + tb_chat_room + " c WHERE ";
         if (chat_open_room) {
-            query_part.add("(c.private = " + connection.escape(0) + ")");
+            query_part.add("(c.private = " + connection.escape(0) + " AND c.users LIKE " + connection.escape('%"' + user + '"%') + ")");
         }
         if (chat_one_to_one) {
             query_part.add("(c.private = " + connection.escape(1) + " AND c.users LIKE " + connection.escape('%"' + user + '"%') + ")");
@@ -488,6 +488,7 @@ var getUserRooms = function(socket, user, pag) {
             query += qp + ' OR ';
         });
         query = query.to(query.length - 4) + " ORDER BY c.last_message_at DESC";
+        console.log(query);
         connection.query(query, function(err, rows) {
             if (err) {
                 return console.log("getUserRooms: " + err);

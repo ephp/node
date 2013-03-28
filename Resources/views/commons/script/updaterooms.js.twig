@@ -2,12 +2,35 @@
     {# Aggiorna l'elenco delle chatroom #}
     socketChat.on('updaterooms', function(rooms, current_room) {
         $('#{{ room_body }}').empty();
-        $.each(rooms, function(key, value) {
-            console.log(value);
-            if (value.chatroom === current_room) {
-                $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+        $.each(rooms, function(key, room) {
+            console.log(room);
+            if (room.chatroom === current_room) {
+                $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html()
+                    .replace(/\[alias\]/g, room.alias)
+                    .replace(/\[id\]/g, room.id)
+                );
             } else {
-                $('#{{ room_body }}').html($('#{{ room_elem }}').html().replace(/\[alias\]/g, value.alias).replace(/\[id\]/g, value.id));
+                user_id = room.chatroom;
+                id_elem = '#{{ public_room_elem }}';
+                if(room.chatroom.remove(/[0-9,]/g).trim() === '') {
+                    var ids = eval("["+user_id+"]");
+                    ids.each(function(id){
+                        if(id != {{ app.user.id }}) {
+                            user_id = id;
+                            id_elem = '#{{ private_room_elem }}';
+                        }
+                    });
+                }
+                if(!room.alias) {
+                    room.alias = user_id;
+                }
+                $('#{{ room_body }}').append($(id_elem).html()
+                    .replace(/\[alias\]/g, room.alias)
+                    .replace(/\[id\]/g, room.id)
+                    .replace(/\[room\]/g, room.chatroom)
+                    .replace(/\[user_id\]/g, user_id)
+                    .replace(/\[last_message\]/g, room.last_message)
+                );
             }
         });
     });
