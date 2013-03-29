@@ -227,7 +227,7 @@ io.sockets.on('connection', function(socket) {
      */
     socket.on('switchRoom', function(newroom) {
         // effettua lo switch
-        if(newroom.chatroom) {
+        if(newroom.chatroom && Array.isArray(newroom.chatroom)) {
             var my_chatroom = newroom.chatroom;
             newroom.chatroom = my_chatroom.sortBy().toString();
         }
