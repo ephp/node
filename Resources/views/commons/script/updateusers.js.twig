@@ -8,7 +8,6 @@ socketChat.on('updateusers', function(users) {
     {% endif %}
     $.each(users, function(key, value) {
         {% if online is defined %}
-            console.log($('.{{ user_class }}_'+value.id));
             $('.{{ user_class }}_'+value.id).removeClass('{{ user_offline_class }}').addClass('{{ user_online_class }}');
         {% endif %}
         {% if chat is defined %}

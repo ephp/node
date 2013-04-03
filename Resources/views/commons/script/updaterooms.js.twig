@@ -3,7 +3,7 @@
     socketChat.on('updaterooms', function(rooms, current_room) {
         $('#{{ room_body }}').empty();
         $.each(rooms, function(key, room) {
-            console.log(room);
+            //console.log(room);
             if (room.chatroom === current_room) {
                 $('#{{ current_room_body }}').html($('#{{ current_room_elem }}').html()
                     .replace(/\[alias\]/g, room.alias)

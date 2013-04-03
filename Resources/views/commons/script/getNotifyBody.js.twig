@@ -9,7 +9,6 @@
                    .replace(/\[chatroom_id\]/g, data.chatroom_id)
                    .replace(/\[fadeout_at\]/g, Date.create(Date.create('now').getTime() + 60000))
                    ;
-       console.log(html);
        return html;
     }
 {% endif %}

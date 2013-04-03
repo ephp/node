@@ -19,6 +19,8 @@ var db_pool = null;
 var tb_users = 'ephp_users';
 var tb_chat_room = 'chat_room';
 var tb_chat_messages = 'chat_messages';
+var tb_chat_notify = 'chat_notify';
+var chat_notify = true;
 var chat_open_room = true;
 var chat_one_to_one = true;
 var chat_group_room = false;
@@ -34,6 +36,8 @@ fs.readFile(config_file, 'utf8', function(err, data) {
     tb_users = readParam(data, 'tb_users:', tb_users);
     tb_chat_room = readParam(data, 'tb_chat_room:', tb_chat_room);
     tb_chat_messages = readParam(data, 'tb_chat_messages:', tb_chat_messages);
+    tb_chat_notify = readParam(data, 'tb_chat_notify:', tb_chat_notify);
+    chat_notify = readParam(data, 'chat_notify:', chat_notify);
     chat_open_room = readParam(data, 'chat_open_room:', chat_open_room);
     chat_one_to_one = readParam(data, 'chat_one_to_one:', chat_one_to_one);
     chat_group_room = readParam(data, 'chat_group_room:', chat_group_room);
@@ -103,7 +107,7 @@ var queryFormat = function(query, values) {
 };
 
 var array_dc2type = function(data) {
-    inner = '';
+    var inner = '';
     i = 0;
     data.each(function(elem) {
         inner += 'i:' + i + ';s:' + elem.length + ':"' + elem + '";';
@@ -113,8 +117,7 @@ var array_dc2type = function(data) {
 };
 
 var dc2type_array = function(data) {
-    out = [];
-    data = data.replace(/(a|s|i):[0-9]+(:|;)/g, '').replace(/\{/g, '[').replace(/;\}/g, ']').replace(/;/g, ',');
+    data = data.replace(/(a|s|i):[0-9]+(:|;)/g, '').replace(/\{/g, '[').replace(/[;]?\}/g, ']').replace(/;/g, ',');
     return eval(data);
 };
 
@@ -162,6 +165,28 @@ io.sockets.on('connection', function(socket) {
         joinRoom(socket, room, user, false);
         //Memorizzo il socket dell'utente
         users_socket[user] = socket;
+        if (chat_notify) {
+            db_pool.getConnection(function(error, connection) {
+                if (error) {
+                    return console.log("addNotify: Connection error");
+                }
+                getUser(user, function(user) {
+                    var query = 'SELECT r.id, r.chatroom, r.users, r.alias, n.notify_at, n.messages, SUBSTR(n.messages, LENGTH(n.messages)-38 ,36) as last_message_id, (SELECT message FROM ' + tb_chat_messages + ' m WHERE m.id = SUBSTR(n.messages, LENGTH(n.messages)-38 ,36)) as last_message FROM ' + tb_chat_notify + ' n, ' + tb_chat_room + ' r WHERE n.chatroom_id = r.id and n.user_id = ' + connection.escape(user.id) + ' AND n.notified = ' + connection.escape(0);
+                    connection.query(query, function(err, rows) {
+                        if (err) {
+                            return console.log("addNotify: " + err);
+                        }
+                        console.log(rows);
+                        rows.each(function(row) {
+                            var ids_messages = dc2type_array(row.messages);
+                            var row_users = dc2type_array(row.users);
+                            var row_alias = dc2type_array(row.alias);
+                            socket.emit('updatenotify', {nickname: row_alias[row_users.findIndex(socket.username)]}, ids_messages.length, {chatroom_id: row.id, message: row.last_message});
+                        });
+                    });
+                });
+            });
+        }
     });
 
     /**
@@ -175,21 +200,21 @@ io.sockets.on('connection', function(socket) {
         sendChat(socket, data, function(out) {
             io.sockets.in(socket.room).emit('updatechat', socket.username, out);
             if (socket._room.private === 1) {
-                console.log(socket._room);
-                var chat_users = dc2type_array(socket._room.users);
-                console.log(chat_users);
-                chat_users.each(function(user) {
-                    if (users_room[user] !== socket.room) {
-                        if (!notify[user]) {
-                            notify[user] = {};
+                if (chat_notify) {
+                    addNotify(socket, out, function(user) {
+                        if (!notify[user.nickname]) {
+                            notify[user.nickname] = {};
                         }
-                        if (!notify[user][socket.room]) {
-                            notify[user][socket.room] = 0;
+                        if (!notify[user.nickname][socket.room]) {
+                            notify[user.nickname][socket.room] = {alias: users[socket.username], n: 0, last_message: ''};
                         }
-                        notify[user][socket.room]++;
-                        users_socket[user].emit('updatenotify', users[socket.username], notify[user][socket.room], out);
-                    }
-                });
+                        notify[user.nickname][socket.room]['n']++;
+                        notify[user.nickname][socket.room]['last_message'] = out;
+                        if (users_socket[user.nickname]) {
+                            users_socket[user.nickname].emit('updatenotify', notify[user.nickname][socket.room]['alias'], notify[user.nickname][socket.room]['n'], notify[user.nickname][socket.room]['last_message']);
+                        }
+                    });
+                }
             }
         });
     });
@@ -203,20 +228,31 @@ io.sockets.on('connection', function(socket) {
     socket.on('previouschat', function(n) {
         // Recupera gli ultimi messaggi della stanza
         if (!n) {
-            if(notify[socket.username] && notify[socket.username][socket.room]) {
-                n = notify[socket.username][socket.room];
-                notify[socket.username][socket.room] = 0;
+            socket.previousfrom = 0;
+            if (chat_notify && socket._room && socket._room.private) {
+                n = 0;
+                removeNotify(socket._room, users[socket.username], function(nm) {
+                    if (nm > 0) {
+                        prevChat(socket, socket.previousfrom, nm, function(out) {
+                            out.each(function(row) {
+                                socket.emit('oldchat', row.nickname, row);
+                                socket.previousfrom = row.send_at;
+                            });
+                        });
+                    }
+                });
             } else {
                 n = 5;
             }
-            socket.previousfrom = 0;
         }
-        prevChat(socket, socket.previousfrom, n, function(out) {
-            out.each(function(row) {
-                socket.emit('oldchat', row.nickname, row);
-                socket.previousfrom = row.send_at;
+        if (n > 0) {
+            prevChat(socket, socket.previousfrom, n, function(out) {
+                out.each(function(row) {
+                    socket.emit('oldchat', row.nickname, row);
+                    socket.previousfrom = row.send_at;
+                });
             });
-        });
+        }
     });
 
     /**
@@ -227,9 +263,9 @@ io.sockets.on('connection', function(socket) {
      */
     socket.on('switchRoom', function(newroom) {
         // effettua lo switch
-        if(newroom.chatroom && Array.isArray(newroom.chatroom)) {
+        if (newroom.chatroom && Array.isArray(newroom.chatroom)) {
             var my_chatroom = newroom.chatroom;
-            newroom.chatroom = my_chatroom.sortBy().toString();
+            newroom.chatroom = my_chatroom.unique().sortBy().toString();
         }
         joinRoom(socket, newroom, socket.username, true);
     });
@@ -248,10 +284,13 @@ io.sockets.on('connection', function(socket) {
                 // aggiorno l'elenco utenti
                 io.sockets.emit('updateusers', users);
                 // notifico l'evento'
-                console.log(socket.messages);
-                socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
+                if (socket.messages) {
+                    socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
+                }
                 delete users_room[socket.username];
-                room_users[socket.room].remove(socket.username);
+                if (room_users[socket.room]) {
+                    room_users[socket.room].remove(socket.username);
+                }
                 socket.leave(socket.room);
                 setTimeout(function() {
                     rooms.each(function(room) {
@@ -288,6 +327,95 @@ var sendChat = function(socket, data, callback) {
                 connection.end();
                 callback(chat);
             });
+        });
+    });
+};
+
+var addNotify = function(socket, msg, callback) {
+    console.info('addNotify');
+    var chat_users = dc2type_array(socket._room.users);
+    chat_users.each(function(user) {
+        if (users_room[user] !== socket.room) {
+            db_pool.getConnection(function(error, connection) {
+                if (error) {
+                    return console.log("addNotify: Connection error");
+                }
+                getUser(user, function(user) {
+                    var query = 'SELECT * FROM ' + tb_chat_notify + ' WHERE chatroom_id = ' + connection.escape(socket._room.id) + ' AND user_id = ' + connection.escape(user.id);
+                    connection.query(query, function(err, rows) {
+                        if (err) {
+                            return console.log("addNotify: " + err);
+                        }
+                        var outnot = null;
+                        rows.each(function(row) {
+                            outnot = row;
+                        });
+                        if (outnot === null) {
+                            notify = {
+                                chatroom_id: socket._room.id,
+                                user_id: user.id,
+                                notify_at: Date.create('now'),
+                                messages: array_dc2type([msg.id]),
+                                notified: 0
+                            };
+                            connection.query('INSERT INTO ' + tb_chat_notify + ' SET ?', notify, function(err, rows) {
+                                if (err) {
+                                    return console.log("addNotify: " + err);
+                                }
+                                connection.query(query, function(err, rows) {
+                                    if (err) {
+                                        return console.log("addNotify: " + err);
+                                    }
+                                    connection.end();
+                                    callback(user);
+                                });
+                            });
+                        } else {
+                            var messages = dc2type_array(outnot.messages);
+                            messages.add(msg.id);
+                            connection.query('UPDATE ' + tb_chat_notify + ' SET notify_at = ' + connection.escape(Date.create('now')) + ', messages = ' + connection.escape(array_dc2type(messages)) + ', notified = ' + connection.escape(0) + ' WHERE chatroom_id = ' + connection.escape(socket._room.id) + ' AND user_id = ' + connection.escape(user.id), function(err, rows) {
+                                if (err) {
+                                    return console.log("addNotify: " + err);
+                                }
+                                connection.end();
+                                callback(user);
+                            });
+                        }
+                    });
+                });
+            });
+        }
+    });
+};
+
+var removeNotify = function(room, user, callback) {
+    console.info('removeNotify');
+    db_pool.getConnection(function(error, connection) {
+        if (error) {
+            return console.log("removeNotify: Connection error");
+        }
+        var query = 'SELECT * FROM ' + tb_chat_notify + ' WHERE chatroom_id = ' + connection.escape(room.id) + ' AND user_id = ' + connection.escape(user.id);
+        connection.query(query, function(err, rows) {
+            if (err) {
+                return console.log("removeNotify: " + err);
+            }
+            var outnot = null;
+            rows.each(function(row) {
+                outnot = row;
+            });
+            if (outnot === null) {
+                connection.end();
+                callback(0);
+            } else {
+                var messages = dc2type_array(outnot.messages);
+                connection.query('UPDATE ' + tb_chat_notify + ' SET notify_at = ' + connection.escape(Date.create('now')) + ', messages = ' + connection.escape(array_dc2type([])) + ', notified = ' + connection.escape(1) + ' WHERE chatroom_id = ' + connection.escape(room.id) + ' AND user_id = ' + connection.escape(user.id), function(err, rows) {
+                    if (err) {
+                        return console.log("removeNotify: " + err);
+                    }
+                    connection.end();
+                    callback(messages.length + 5);
+                });
+            }
         });
     });
 };
@@ -480,7 +608,6 @@ var getUserRooms = function(socket, user, pag) {
             query += qp + ' OR ';
         });
         query = query.to(query.length - 4) + " ORDER BY c.last_message_at DESC";
-        console.log(query);
         connection.query(query, function(err, rows) {
             if (err) {
                 return console.log("getUserRooms: " + err);
