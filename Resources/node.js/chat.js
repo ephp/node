@@ -166,26 +166,7 @@ io.sockets.on('connection', function(socket) {
         //Memorizzo il socket dell'utente
         users_socket[user] = socket;
         if (chat_notify) {
-            db_pool.getConnection(function(error, connection) {
-                if (error) {
-                    return console.log("addNotify: Connection error");
-                }
-                getUser(user, function(user) {
-                    var query = 'SELECT r.id, r.chatroom, r.users, r.alias, n.notify_at, n.messages, SUBSTR(n.messages, LENGTH(n.messages)-38 ,36) as last_message_id, (SELECT message FROM ' + tb_chat_messages + ' m WHERE m.id = SUBSTR(n.messages, LENGTH(n.messages)-38 ,36)) as last_message FROM ' + tb_chat_notify + ' n, ' + tb_chat_room + ' r WHERE n.chatroom_id = r.id and n.user_id = ' + connection.escape(user.id) + ' AND n.notified = ' + connection.escape(0);
-                    connection.query(query, function(err, rows) {
-                        if (err) {
-                            return console.log("addNotify: " + err);
-                        }
-                        console.log(rows);
-                        rows.each(function(row) {
-                            var ids_messages = dc2type_array(row.messages);
-                            var row_users = dc2type_array(row.users);
-                            var row_alias = dc2type_array(row.alias);
-                            socket.emit('updatenotify', {nickname: row_alias[row_users.findIndex(socket.username)]}, ids_messages.length, {chatroom_id: row.id, message: row.last_message});
-                        });
-                    });
-                });
-            });
+            sendNotify(socket, user);
         }
     });
 
@@ -202,17 +183,7 @@ io.sockets.on('connection', function(socket) {
             if (socket._room.private === 1) {
                 if (chat_notify) {
                     addNotify(socket, out, function(user) {
-                        if (!notify[user.nickname]) {
-                            notify[user.nickname] = {};
-                        }
-                        if (!notify[user.nickname][socket.room]) {
-                            notify[user.nickname][socket.room] = {alias: users[socket.username], n: 0, last_message: ''};
-                        }
-                        notify[user.nickname][socket.room]['n']++;
-                        notify[user.nickname][socket.room]['last_message'] = out;
-                        if (users_socket[user.nickname]) {
-                            users_socket[user.nickname].emit('updatenotify', notify[user.nickname][socket.room]['alias'], notify[user.nickname][socket.room]['n'], notify[user.nickname][socket.room]['last_message']);
-                        }
+                        sendNotify(users_socket[user.nickname], user.nickname);
                     });
                 }
             }
@@ -329,6 +300,33 @@ var sendChat = function(socket, data, callback) {
             });
         });
     });
+};
+
+var sendNotify = function(socket, user) {
+    console.info('sendNotify');
+    db_pool.getConnection(function(error, connection) {
+        if (error) {
+            return console.log("sendNotify: Connection error");
+        }
+        getUser(user, function(user) {
+            var query = 'SELECT r.id, r.chatroom, r.users, r.alias, n.notify_at, n.messages, SUBSTR(n.messages, LENGTH(n.messages)-38 ,36) as last_message_id, (SELECT message FROM ' + tb_chat_messages + ' m WHERE m.id = SUBSTR(n.messages, LENGTH(n.messages)-38 ,36)) as last_message FROM ' + tb_chat_notify + ' n, ' + tb_chat_room + ' r WHERE n.chatroom_id = r.id and n.user_id = ' + connection.escape(user.id) + ' AND n.notified = ' + connection.escape(0);
+            connection.query(query, function(err, rows) {
+                if (err) {
+                    return console.log("sendNotify: " + err);
+                }
+                rows.each(function(row) {
+                    var ids_messages = dc2type_array(row.messages);
+                    var row_users = dc2type_array(row.users);
+                    var row_alias = dc2type_array(row.alias);
+                    var ids = eval('[' + row.chatroom + ']');
+                    ids.remove(user.id);
+                    socket.emit('updatenotify', {id: ids.first(), nickname: row_alias[row_users.findIndex(socket.username)]}, ids_messages.length, {chatroom_id: row.id, message: row.last_message});
+                });
+                connection.end();
+            });
+        });
+    });
+
 };
 
 var addNotify = function(socket, msg, callback) {
