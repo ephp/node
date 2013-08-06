@@ -183,7 +183,9 @@ io.sockets.on('connection', function(socket) {
             if (socket._room.private === 1) {
                 if (chat_notify) {
                     addNotify(socket, out, function(user) {
-                        sendNotify(users_socket[user.nickname], user.nickname);
+                        if(users_socket[user.nickname]) {
+                            sendNotify(users_socket[user.nickname], user.nickname);
+                        }
                     });
                 }
             }
