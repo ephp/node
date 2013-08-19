@@ -43,50 +43,49 @@ fs.readFile('./'+config+'.yml', 'utf8', function(err, data) {
     // Abilito il listener della chat
     config_file = readParam(data, 'config:', config_file);
     parameters_file = readParam(data, 'parameters:', parameters_file);
-});
-
-fs.readFile(config_file, 'utf8', function(err, data) {
-    if (err) {
-        return console.log(err);
-    }
-    // Abilito il listener della chat
-    tb_users = readParam(data, 'tb_users:', tb_users);
-    tb_chat_room = readParam(data, 'tb_chat_room:', tb_chat_room);
-    tb_chat_messages = readParam(data, 'tb_chat_messages:', tb_chat_messages);
-    tb_chat_notify = readParam(data, 'tb_chat_notify:', tb_chat_notify);
-    chat_notify = readParam(data, 'chat_notify:', chat_notify);
-    chat_open_room = readParam(data, 'chat_open_room:', chat_open_room);
-    chat_one_to_one = readParam(data, 'chat_one_to_one:', chat_one_to_one);
-    chat_group_room = readParam(data, 'chat_group_room:', chat_group_room);
-});
-
-fs.readFile(parameters_file, 'utf8', function(err, data) {
-    if (err) {
-        return console.log(err);
-    }
-    // Abilito il listener della chat
-    chat_port = readParam(data, 'node.chat.port:', chat_port);
-    server.listen(chat_port);
-    console.log('Chat enabled on port ' + chat_port);
-
-    server_number = readParam(data, 'server_number:', server_number);
-    console.log('Server number ' + server_number);
-
-    database_host = readParam(data, 'database_host:', database_host);
-    database_port = readParam(data, 'database_port:', database_port);
-    database_name = readParam(data, 'database_name:', database_name);
-    database_user = readParam(data, 'database_user:', database_user);
-    database_password = readParam(data, 'database_password:', database_password);
-
-
-    db_pool = mysql.createPool({
-        database: database_name,
-        port: database_port,
-        host: database_host,
-        user: database_user,
-        password: database_password
+    fs.readFile(config_file, 'utf8', function(err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        // Abilito il listener della chat
+        tb_users = readParam(data, 'tb_users:', tb_users);
+        tb_chat_room = readParam(data, 'tb_chat_room:', tb_chat_room);
+        tb_chat_messages = readParam(data, 'tb_chat_messages:', tb_chat_messages);
+        tb_chat_notify = readParam(data, 'tb_chat_notify:', tb_chat_notify);
+        chat_notify = readParam(data, 'chat_notify:', chat_notify);
+        chat_open_room = readParam(data, 'chat_open_room:', chat_open_room);
+        chat_one_to_one = readParam(data, 'chat_one_to_one:', chat_one_to_one);
+        chat_group_room = readParam(data, 'chat_group_room:', chat_group_room);
     });
-    console.log('Connected to db');
+
+    fs.readFile(parameters_file, 'utf8', function(err, data) {
+        if (err) {
+            return console.log(err);
+        }
+        // Abilito il listener della chat
+        chat_port = readParam(data, 'node.chat.port:', chat_port);
+        server.listen(chat_port);
+        console.log('Chat enabled on port ' + chat_port);
+
+        server_number = readParam(data, 'server_number:', server_number);
+        console.log('Server number ' + server_number);
+
+        database_host = readParam(data, 'database_host:', database_host);
+        database_port = readParam(data, 'database_port:', database_port);
+        database_name = readParam(data, 'database_name:', database_name);
+        database_user = readParam(data, 'database_user:', database_user);
+        database_password = readParam(data, 'database_password:', database_password);
+
+
+        db_pool = mysql.createPool({
+            database: database_name,
+            port: database_port,
+            host: database_host,
+            user: database_user,
+            password: database_password
+        });
+        console.log('Connected to db');
+    });
 });
 
 var readParam = function(parameters, parameter, default_value) {
