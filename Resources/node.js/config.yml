@@ -1,0 +1,3 @@
+node: 
+  parameters: ./app/config/parameters.yml
+  config: ./app/config/config.yml

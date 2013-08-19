@@ -28,6 +28,23 @@ var chat_group_room = false;
 var config_file = './app/config/config.yml';
 var parameters_file = './app/config/parameters.yml';
 
+var config = 'config';
+
+process.argv.forEach(function (val, index, array) {
+    if(index === 2) {
+        config = val;
+    }
+});
+
+fs.readFile('./'+config+'.yml', 'utf8', function(err, data) {
+    if (err) {
+        return console.log(err);
+    }
+    // Abilito il listener della chat
+    config_file = readParam(data, 'config:', config_file);
+    parameters_file = readParam(data, 'parameters:', parameters_file);
+});
+
 fs.readFile(config_file, 'utf8', function(err, data) {
     if (err) {
         return console.log(err);
