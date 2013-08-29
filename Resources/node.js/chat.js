@@ -134,7 +134,7 @@ io.sockets.on('connection', function(socket) {
         addUser(socket, user, room, function() {
             // preparo le rooms
             console.log(users[user]);
-            socket.online = users[user].chat_status;
+            socket.online = users[user].status;
             // faccio entrare l'utente nella stanza default
             joinRoom(socket, room, user, false);
             // notifico lo stato
@@ -154,8 +154,8 @@ io.sockets.on('connection', function(socket) {
      * @var data string messaggio di chat
      */
     socket.on('changestatus', function(status) {
-        users[socket.username].chat_status = status;
-        socket.emit('updatestatus', users[socket.username].chat_status);
+        users[socket.username].status = status;
+        socket.emit('updatestatus', users[socket.username].status);
         getUser(socket.username, function(out) {
             out.dati = ephp.unserializePhp(out.dati);
             out.dati.chat_status = status;
