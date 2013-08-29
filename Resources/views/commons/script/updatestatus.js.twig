@@ -1,0 +1,4 @@
+{# Aggiorna l'elenco degli utenti online #}
+socketChat.on('updatestatus', function(status) {
+    $('#{{ status_button }}').html(status);
+});

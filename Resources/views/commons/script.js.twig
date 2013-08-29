@@ -20,6 +20,7 @@
     {% if notify_body is not defined %}{% set notify_body = 'notify_messages' %}{% endif %}
     {% if notify_message is not defined %}{% set notify_message = 'notify_message' %}{% endif %}
     {% if updatechat_callback is not defined %}{% set updatechat_callback = false %}{% endif %}
+    {% if status_button is not defined %}{% set status_button = 'change_status' %}{% endif %}
 
     var socketChat = io.connect('{{ node_server|raw }}:{{ node_chat_port|raw }}');
     $(document).ready(function(){
@@ -35,6 +36,7 @@
         {% include "EphpNodeBundle:commons:script/updatenotify.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updaterooms.js.twig" %}
         {% include "EphpNodeBundle:commons:script/updateusers.js.twig" %}
+        {% include "EphpNodeBundle:commons:script/updatestatus.js.twig" %}
 
         // Inizializzazione dei comportamenti
         $(function() {
@@ -42,7 +44,10 @@
             {% include "EphpNodeBundle:commons:script/onready/sendChat.js.twig" %}
             {% include "EphpNodeBundle:commons:script/onready/enterChat.js.twig" %}
             {% include "EphpNodeBundle:commons:script/onready/switchRoom.js.twig" %}
+            {% include "EphpNodeBundle:commons:script/onready/changeStatus.js.twig" %}
+            {% include "EphpNodeBundle:commons:script/onready/custom.js.twig" %}
         });
+        {% include "EphpNodeBundle:commons:script/custom.js.twig" %}
     });
     {% include "EphpNodeBundle:commons:script/switchRoom.js.twig" %}
 {% endif %}

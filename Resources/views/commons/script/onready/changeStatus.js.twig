@@ -1,0 +1,6 @@
+{% if chat is defined %}
+    {# Trigger sul cambio stato della chat #}
+    $('#{{ status_button }}').keypress(function(e) {
+        socketChat.emit('changestatus', status === 'Online' ? 'Offline' : 'Online');
+    });
+{% endif %}

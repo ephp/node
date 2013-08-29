@@ -5,6 +5,7 @@ var express = require('express')
         , sugar = require('sugar')
         , fs = require('fs')
         , mysql = require('mysql')
+        , ephp = require('./ephp_module/utility')
         ;
 
 var chat_port = 0;
@@ -30,32 +31,32 @@ var parameters_file = './app/config/parameters.yml';
 
 var config = 'config';
 
-process.argv.forEach(function (val, index, array) {
-    if(index === 2) {
+process.argv.forEach(function(val, index, array) {
+    if (index === 2) {
         config = val;
     }
 });
 
-fs.readFile('./'+config+'.yml', 'utf8', function(err, data) {
+fs.readFile('./' + config + '.yml', 'utf8', function(err, data) {
     if (err) {
         return console.log(err);
     }
     // Abilito il listener della chat
-    config_file = readParam(data, 'config:', config_file);
-    parameters_file = readParam(data, 'parameters:', parameters_file);
+    config_file = ephp.readParam(data, 'config:', config_file);
+    parameters_file = ephp.readParam(data, 'parameters:', parameters_file);
     fs.readFile(config_file, 'utf8', function(err, data) {
         if (err) {
             return console.log(err);
         }
         // Abilito il listener della chat
-        tb_users = readParam(data, 'tb_users:', tb_users);
-        tb_chat_room = readParam(data, 'tb_chat_room:', tb_chat_room);
-        tb_chat_messages = readParam(data, 'tb_chat_messages:', tb_chat_messages);
-        tb_chat_notify = readParam(data, 'tb_chat_notify:', tb_chat_notify);
-        chat_notify = readParam(data, 'chat_notify:', chat_notify);
-        chat_open_room = readParam(data, 'chat_open_room:', chat_open_room);
-        chat_one_to_one = readParam(data, 'chat_one_to_one:', chat_one_to_one);
-        chat_group_room = readParam(data, 'chat_group_room:', chat_group_room);
+        tb_users = ephp.readParam(data, 'tb_users:', tb_users);
+        tb_chat_room = ephp.readParam(data, 'tb_chat_room:', tb_chat_room);
+        tb_chat_messages = ephp.readParam(data, 'tb_chat_messages:', tb_chat_messages);
+        tb_chat_notify = ephp.readParam(data, 'tb_chat_notify:', tb_chat_notify);
+        chat_notify = ephp.readParam(data, 'chat_notify:', chat_notify);
+        chat_open_room = ephp.readParam(data, 'chat_open_room:', chat_open_room);
+        chat_one_to_one = ephp.readParam(data, 'chat_one_to_one:', chat_one_to_one);
+        chat_group_room = ephp.readParam(data, 'chat_group_room:', chat_group_room);
     });
 
     fs.readFile(parameters_file, 'utf8', function(err, data) {
@@ -63,18 +64,18 @@ fs.readFile('./'+config+'.yml', 'utf8', function(err, data) {
             return console.log(err);
         }
         // Abilito il listener della chat
-        chat_port = readParam(data, 'node.chat.port:', chat_port);
+        chat_port = ephp.readParam(data, 'node.chat.port:', chat_port);
         server.listen(chat_port);
         console.log('Chat enabled on port ' + chat_port);
 
-        server_number = readParam(data, 'server_number:', server_number);
+        server_number = ephp.readParam(data, 'server_number:', server_number);
         console.log('Server number ' + server_number);
 
-        database_host = readParam(data, 'database_host:', database_host);
-        database_port = readParam(data, 'database_port:', database_port);
-        database_name = readParam(data, 'database_name:', database_name);
-        database_user = readParam(data, 'database_user:', database_user);
-        database_password = readParam(data, 'database_password:', database_password);
+        database_host = ephp.readParam(data, 'database_host:', database_host);
+        database_port = ephp.readParam(data, 'database_port:', database_port);
+        database_name = ephp.readParam(data, 'database_name:', database_name);
+        database_user = ephp.readParam(data, 'database_user:', database_user);
+        database_password = ephp.readParam(data, 'database_password:', database_password);
 
 
         db_pool = mysql.createPool({
@@ -88,29 +89,6 @@ fs.readFile('./'+config+'.yml', 'utf8', function(err, data) {
     });
 });
 
-var readParam = function(parameters, parameter, default_value) {
-    out = '';
-    start = parameters.search(parameter);
-    if (start > 0) {
-        start += parameter.length;
-        out = parameters.substr(start);
-        end = out.search('\n');
-        if (end > 0) {
-            out = out.substr(0, end).trim();
-        } else {
-            out = out.trim();
-        }
-    }
-    if (out.search(/^null$/i) >= 0 || out === '') {
-        out = default_value;
-    } else if (out.search(/^(true|yes)$/i) >= 0) {
-        out = true;
-    } else if (out.search(/^(false|no)$/i) >= 0) {
-        out = false;
-    }
-    return out;
-};
-
 var queryFormat = function(query, values) {
     if (!values)
         return query;
@@ -120,29 +98,6 @@ var queryFormat = function(query, values) {
         }
         return txt;
     }.bind(this));
-};
-
-var array_dc2type = function(data) {
-    var inner = '';
-    i = 0;
-    data.each(function(elem) {
-        inner += 'i:' + i + ';s:' + elem.length + ':"' + elem + '";';
-        i++;
-    });
-    return 'a:' + data.length + ':{' + inner + '}';
-};
-
-var dc2type_array = function(data) {
-    data = data.replace(/(a|s|i):[0-9]+(:|;)/g, '').replace(/\{/g, '[').replace(/[;]?\}/g, ']').replace(/;/g, ',');
-    return eval(data);
-};
-
-var guid = function() {
-    var dataHex = Date.create('now').getTime().toString(16);
-    return dataHex.to(8) + '-' + server_number + dataHex.from(8) + '-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : r & 0x3 | 0x8;
-        return v.toString(16);
-    });
 };
 
 // routing di express ??
@@ -173,10 +128,12 @@ io.sockets.on('connection', function(socket) {
         socket.username = user;
         // preparo le rooms
         socket.rooms = [];
-        //Aggiungo l'utente fra quelli attivi
-        addUser(socket, user);
         // memorizzo la stanza di default nella sessione del socket associata al client
         room = room ? room : {chatroom: socket.messages.default_room, alias: socket.messages.default_room};
+        //Aggiungo l'utente fra quelli attivi
+        addUser(socket, user, room);
+        // preparo le rooms
+        socket.online = users[user].chat_status;
         // faccio entrare l'utente nella stanza default
         joinRoom(socket, room, user, false);
         //Memorizzo il socket dell'utente
@@ -184,6 +141,23 @@ io.sockets.on('connection', function(socket) {
         if (chat_notify) {
             sendNotify(socket, user);
         }
+        socket.emit('updatestatus', users[user].chat_status);
+    });
+
+    /**
+     * emits 'sendchat'
+     * 
+     * Riceve un messaggio da inviare in una stanza della chat
+     * @var data string messaggio di chat
+     */
+    socket.on('changestatus', function(status) {
+        users[socket.username].chat_status = status;
+        socket.emit('updatestatus', users[socket.username].chat_status);
+        getUser(socket.username, functionfunction(out) {
+            out.dati = ephp.unserializePhp(out.dati);
+            out.dati.chat_status = status;
+            setDatiUser(user, out.dati);
+        });
     });
 
     /**
@@ -199,7 +173,7 @@ io.sockets.on('connection', function(socket) {
             if (socket._room.private === 1) {
                 if (chat_notify) {
                     addNotify(socket, out, function(user) {
-                        if(users_socket[user.nickname]) {
+                        if (users_socket[user.nickname]) {
                             sendNotify(users_socket[user.nickname], user.nickname);
                         }
                     });
@@ -298,7 +272,7 @@ var sendChat = function(socket, data, callback) {
             return console.log("sendChat: Connection error");
         }
         chat = {
-            id: guid(),
+            id: ephp.guid(server_number),
             chatroom_id: socket._room.id,
             user_id: users[socket.username].id,
             send_at: Date.create('now'),
@@ -333,9 +307,9 @@ var sendNotify = function(socket, user) {
                     return console.log("sendNotify: " + err);
                 }
                 rows.each(function(row) {
-                    var ids_messages = dc2type_array(row.messages);
-                    var row_users = dc2type_array(row.users);
-                    var row_alias = dc2type_array(row.alias);
+                    var ids_messages = ephp.unserializePhp(row.messages);
+                    var row_users = ephp.unserializePhp(row.users);
+                    var row_alias = ephp.unserializePhp(row.alias);
                     var ids = eval('[' + row.chatroom + ']');
                     ids.remove(user.id);
                     socket.emit('updatenotify', {id: ids.first(), nickname: row_alias[row_users.findIndex(socket.username)]}, ids_messages.length, {chatroom_id: row.id, message: row.last_message});
@@ -349,7 +323,7 @@ var sendNotify = function(socket, user) {
 
 var addNotify = function(socket, msg, callback) {
     console.info('addNotify');
-    var chat_users = dc2type_array(socket._room.users);
+    var chat_users = ephp.unserializePhp(socket._room.users);
     chat_users.each(function(user) {
         if (users_room[user] !== socket.room) {
             db_pool.getConnection(function(error, connection) {
@@ -371,7 +345,7 @@ var addNotify = function(socket, msg, callback) {
                                 chatroom_id: socket._room.id,
                                 user_id: user.id,
                                 notify_at: Date.create('now'),
-                                messages: array_dc2type([msg.id]),
+                                messages: ephp.unserializePhp([msg.id]),
                                 notified: 0
                             };
                             connection.query('INSERT INTO ' + tb_chat_notify + ' SET ?', notify, function(err, rows) {
@@ -387,9 +361,9 @@ var addNotify = function(socket, msg, callback) {
                                 });
                             });
                         } else {
-                            var messages = dc2type_array(outnot.messages);
+                            var messages = ephp.unserializePhp(outnot.messages);
                             messages.add(msg.id);
-                            connection.query('UPDATE ' + tb_chat_notify + ' SET notify_at = ' + connection.escape(Date.create('now')) + ', messages = ' + connection.escape(array_dc2type(messages)) + ', notified = ' + connection.escape(0) + ' WHERE chatroom_id = ' + connection.escape(socket._room.id) + ' AND user_id = ' + connection.escape(user.id), function(err, rows) {
+                            connection.query('UPDATE ' + tb_chat_notify + ' SET notify_at = ' + connection.escape(Date.create('now')) + ', messages = ' + connection.escape(ephp.serializePhp(messages)) + ', notified = ' + connection.escape(0) + ' WHERE chatroom_id = ' + connection.escape(socket._room.id) + ' AND user_id = ' + connection.escape(user.id), function(err, rows) {
                                 if (err) {
                                     return console.log("addNotify: " + err);
                                 }
@@ -423,8 +397,8 @@ var removeNotify = function(room, user, callback) {
                 connection.end();
                 callback(0);
             } else {
-                var messages = dc2type_array(outnot.messages);
-                connection.query('UPDATE ' + tb_chat_notify + ' SET notify_at = ' + connection.escape(Date.create('now')) + ', messages = ' + connection.escape(array_dc2type([])) + ', notified = ' + connection.escape(1) + ' WHERE chatroom_id = ' + connection.escape(room.id) + ' AND user_id = ' + connection.escape(user.id), function(err, rows) {
+                var messages = ephp.unserializePhp(outnot.messages);
+                connection.query('UPDATE ' + tb_chat_notify + ' SET notify_at = ' + connection.escape(Date.create('now')) + ', messages = ' + connection.escape(ephp.serializePhp([])) + ', notified = ' + connection.escape(1) + ' WHERE chatroom_id = ' + connection.escape(room.id) + ' AND user_id = ' + connection.escape(user.id), function(err, rows) {
                     if (err) {
                         return console.log("removeNotify: " + err);
                     }
@@ -461,9 +435,30 @@ var prevChat = function(socket, from, limit, callback) {
 };
 
 
-var addUser = function(socket, user) {
+var addUser = function(socket, user, room) {
     console.info('addUser');
     getUser(user, function(out) {
+        var update_user = false;
+        if (!out.dati) {
+            out.dati = {chat_status: 'Offline', chat_last_room: room};
+            update_user = true;
+        } else {
+            out.dati = ephp.unserializePhp(out.dati);
+            if (!out.dati.chat_status) {
+                out.dati.chat_status = 'Offline';
+                update_user = true;
+            }
+            if (!out.dati.chat_last_room) {
+                out.dati.chat_last_room = room;
+                update_user = true;
+            }
+        }
+        if (update_user) {
+            setDatiUser(user, out.dati);
+        }
+        out.status = out.dati.chat_status;
+        out.last_room = out.dati.chat_last_room;
+        delete out.dati;
         users[user] = out;
         socket.emit('updateusers', users);
         setTimeout(function() {
@@ -480,7 +475,7 @@ var getUser = function(user, callback) {
         if (error) {
             return console.log("getUser: Connection error");
         }
-        connection.query('SELECT id, nickname, gender, roles FROM ' + tb_users + ' WHERE nickname = ' + connection.escape(user), function(err, rows) {
+        connection.query('SELECT id, nickname, gender, roles, dati FROM ' + tb_users + ' WHERE nickname = ' + connection.escape(user), function(err, rows) {
             if (err) {
                 return console.log("getUser: " + err);
             }
@@ -488,6 +483,21 @@ var getUser = function(user, callback) {
                 // aggiungo l'username del client all'elenco degli utenti attivi
                 callback(row);
             });
+            connection.end();
+        });
+    });
+};
+
+var setDatiUser = function(user, dati) {
+    console.info('getUser');
+    db_pool.getConnection(function(error, connection) {
+        if (error) {
+            return console.log("getUser: Connection error");
+        }
+        connection.query('UPDATE ' + tb_users + ' SET dati = ' + connection.escape(ephp.serializePhp(dati)) + ' WHERE nickname = ' + connection.escape(user), function(err, rows) {
+            if (err) {
+                return console.log("getUser: " + err);
+            }
             connection.end();
         });
     });
@@ -527,6 +537,11 @@ var joinRoom = function(socket, chatroom, user, switch_room) {
         socket.broadcast.to(socket.room).emit('updatenotice', socket.messages.server, socket.messages.enter.replace(/__nickname__/g, socket.username));
         // visualiza le rooma de3ll'utente e le spara
         getUserRooms(socket, user, 1);
+        getUser(socket.username, functionfunction(out) {
+            out.dati = ephp.unserializePhp(out.dati);
+            out.dati.chat_last_room = chatroom;
+            setDatiUser(user, out.dati);
+        });
     });
 };
 
@@ -554,11 +569,11 @@ var getChatroom = function(socket, room, user, callback) {
                     chat_alias.add(user);
                 }
                 chatroom = {
-                    id: guid(),
+                    id: ephp.guid(server_number),
                     chatroom: room.chatroom,
                     private: chat_private,
-                    users: array_dc2type(chat_user),
-                    alias: array_dc2type(chat_alias),
+                    users: ephp.serializePhp(chat_user),
+                    alias: ephp.serializePhp(chat_alias),
                     locale: socket.messages.default_locale
                 };
                 connection.query('INSERT INTO ' + tb_chat_room + ' SET ?', chatroom, function(err, rows) {
@@ -578,12 +593,12 @@ var getChatroom = function(socket, room, user, callback) {
                 });
             } else {
                 if (room.alias) {
-                    var my_chatroom_user = dc2type_array(out.users);
+                    var my_chatroom_user = ephp.unserializePhp(out.users);
                     if (!my_chatroom_user.find(socket.username)) {
                         my_chatroom_user.add(socket.username);
-                        var my_chatroom_alias = dc2type_array(out.alias);
+                        var my_chatroom_alias = ephp.unserializePhp(out.alias);
                         my_chatroom_alias.add(room.alias);
-                        connection.query('UPDATE ' + tb_chat_room + ' SET users = ' + connection.escape(array_dc2type(my_chatroom_user)) + ', alias = ' + connection.escape(array_dc2type(my_chatroom_alias)) + ' WHERE id = ' + connection.escape(out.id), function(err, rows) {
+                        connection.query('UPDATE ' + tb_chat_room + ' SET users = ' + connection.escape(ephp.serializePhp(my_chatroom_user)) + ', alias = ' + connection.escape(ephp.serializePhp(my_chatroom_alias)) + ' WHERE id = ' + connection.escape(out.id), function(err, rows) {
                             if (err) {
                                 return console.log("getChatroom: " + err);
                             }
@@ -630,8 +645,8 @@ var getUserRooms = function(socket, user, pag) {
             }
             socket.rooms = [];
             rows.each(function(row) {
-                var my_room_users = dc2type_array(row.users);
-                var my_room_alias = dc2type_array(row.alias);
+                var my_room_users = ephp.unserializePhp(row.users);
+                var my_room_alias = ephp.unserializePhp(row.alias);
                 var my_index = my_room_users.findIndex(socket.username);
                 var my_room = {
                     'id': row.id,
