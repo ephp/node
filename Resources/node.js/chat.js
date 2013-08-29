@@ -133,6 +133,7 @@ io.sockets.on('connection', function(socket) {
         //Aggiungo l'utente fra quelli attivi
         addUser(socket, user, room);
         // preparo le rooms
+        console.log(users[user]);
         socket.online = users[user].chat_status;
         // faccio entrare l'utente nella stanza default
         joinRoom(socket, room, user, false);
