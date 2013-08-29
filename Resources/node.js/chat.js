@@ -5,7 +5,7 @@ var express = require('express')
         , sugar = require('sugar')
         , fs = require('fs')
         , mysql = require('mysql')
-        , ephp = require('./ephp_module/utility')
+        , ephp = require('./ephp_modules/utility')
         ;
 
 var chat_port = 0;
