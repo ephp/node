@@ -437,7 +437,7 @@ var prevChat = function(socket, from, limit, callback) {
     }
 };
 
-var addUser = function(socket, user, room) {
+var addUser = function(socket, user, room, callback) {
     console.info('addUser');
     getUser(user, function(out) {
         var update_user = false;
@@ -468,6 +468,9 @@ var addUser = function(socket, user, room) {
                 io.sockets.in(room).emit('updateusers', users);
             });
         }, 250);
+        if(callback) {
+            callback();
+        }
     });
 };
 
