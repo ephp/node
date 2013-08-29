@@ -153,7 +153,7 @@ io.sockets.on('connection', function(socket) {
     socket.on('changestatus', function(status) {
         users[socket.username].chat_status = status;
         socket.emit('updatestatus', users[socket.username].chat_status);
-        getUser(socket.username, functionfunction(out) {
+        getUser(socket.username, function(out) {
             out.dati = ephp.unserializePhp(out.dati);
             out.dati.chat_status = status;
             setDatiUser(user, out.dati);
