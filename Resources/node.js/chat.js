@@ -131,18 +131,20 @@ io.sockets.on('connection', function(socket) {
         // memorizzo la stanza di default nella sessione del socket associata al client
         room = room ? room : {chatroom: socket.messages.default_room, alias: socket.messages.default_room};
         //Aggiungo l'utente fra quelli attivi
-        addUser(socket, user, room);
-        // preparo le rooms
-        console.log(users[user]);
-        socket.online = users[user].chat_status;
-        // faccio entrare l'utente nella stanza default
-        joinRoom(socket, room, user, false);
+        addUser(socket, user, room, function() {
+            // preparo le rooms
+            console.log(users[user]);
+            socket.online = users[user].chat_status;
+            // faccio entrare l'utente nella stanza default
+            joinRoom(socket, room, user, false);
+            // notifico lo stato
+            socket.emit('updatestatus', users[user].chat_status);
+        });
         //Memorizzo il socket dell'utente
         users_socket[user] = socket;
         if (chat_notify) {
             sendNotify(socket, user);
         }
-        socket.emit('updatestatus', users[user].chat_status);
     });
 
     /**
