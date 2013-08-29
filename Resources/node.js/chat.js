@@ -159,7 +159,7 @@ io.sockets.on('connection', function(socket) {
         getUser(socket.username, function(out) {
             out.dati = ephp.unserializePhp(out.dati);
             out.dati.chat_status = status;
-            setDatiUser(user, out.dati);
+            setDatiUser(socket.username, out.dati);
         });
     });
 
@@ -545,7 +545,7 @@ var joinRoom = function(socket, chatroom, user, switch_room) {
         getUser(socket.username, function(out) {
             out.dati = ephp.unserializePhp(out.dati);
             out.dati.chat_last_room = chatroom;
-            setDatiUser(user, out.dati);
+            setDatiUser(socket.username, out.dati);
         });
     });
 };
