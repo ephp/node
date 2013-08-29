@@ -138,7 +138,7 @@ io.sockets.on('connection', function(socket) {
             // faccio entrare l'utente nella stanza default
             joinRoom(socket, room, user, false);
             // notifico lo stato
-            socket.emit('updatestatus', users[user].chat_status);
+            socket.emit('updatestatus', users[user].status);
         });
         //Memorizzo il socket dell'utente
         users_socket[user] = socket;
