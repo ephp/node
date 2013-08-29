@@ -434,7 +434,6 @@ var prevChat = function(socket, from, limit, callback) {
     }
 };
 
-
 var addUser = function(socket, user, room) {
     console.info('addUser');
     getUser(user, function(out) {
