@@ -464,13 +464,13 @@ var addUser = function(socket, user, room, callback) {
         users[user] = out;
         socket.emit('updateusers', users);
         setTimeout(function() {
+            if(callback) {
+                callback();
+            }
             rooms.each(function(room) {
                 io.sockets.in(room).emit('updateusers', users);
             });
         }, 250);
-        if(callback) {
-            callback();
-        }
     });
 };
 
