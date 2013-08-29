@@ -537,7 +537,7 @@ var joinRoom = function(socket, chatroom, user, switch_room) {
         socket.broadcast.to(socket.room).emit('updatenotice', socket.messages.server, socket.messages.enter.replace(/__nickname__/g, socket.username));
         // visualiza le rooma de3ll'utente e le spara
         getUserRooms(socket, user, 1);
-        getUser(socket.username, functionfunction(out) {
+        getUser(socket.username, function(out) {
             out.dati = ephp.unserializePhp(out.dati);
             out.dati.chat_last_room = chatroom;
             setDatiUser(user, out.dati);
