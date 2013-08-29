@@ -261,7 +261,7 @@ var unserializePhp = function (data) {
   return _unserialize((data + ''), 0)[2];
 }
 
-var guid = function() {
+var guid = function(server_number) {
     var dataHex = Date.create('now').getTime().toString(16);
     return dataHex.to(8) + '-' + server_number + dataHex.from(8) + '-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c === 'x' ? r : r & 0x3 | 0x8;
