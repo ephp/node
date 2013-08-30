@@ -344,6 +344,7 @@ var addNotify = function(socket, msg, callback) {
                             outnot = row;
                         });
                         if (outnot === null) {
+                            console.log[msg];
                             notify = {
                                 chatroom_id: socket._room.id,
                                 user_id: user.id,
