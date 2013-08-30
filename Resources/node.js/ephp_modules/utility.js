@@ -164,7 +164,6 @@ var unserializePhp = function (data) {
       if (!offset) {
         offset = 0;
       }
-      console.log(data);
       dtype = (data.slice(offset, offset + 1)).toLowerCase();
 
       dataoffset = offset + 2;

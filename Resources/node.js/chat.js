@@ -345,14 +345,11 @@ var addNotify = function(socket, msg, callback) {
                             outnot = row;
                         });
                         if (outnot === null) {
-                            console.log('---------------');
-                            console.log(msg);
-                            console.log('---------------');
                             notify = {
                                 chatroom_id: socket._room.id,
                                 user_id: user.id,
                                 notify_at: Date.create('now'),
-                                messages: ephp.unserializePhp([msg.id]),
+                                messages: ephp.serializePhp([msg.id]),
                                 notified: 0
                             };
                             connection.query('INSERT INTO ' + tb_chat_notify + ' SET ?', notify, function(err, rows) {
