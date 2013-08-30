@@ -326,6 +326,7 @@ var sendNotify = function(socket, user) {
 
 var addNotify = function(socket, msg, callback) {
     console.info('addNotify');
+    console.log(msg);
     var chat_users = ephp.unserializePhp(socket._room.users);
     chat_users.each(function(user) {
         if (users_room[user] !== socket.room) {
@@ -344,7 +345,9 @@ var addNotify = function(socket, msg, callback) {
                             outnot = row;
                         });
                         if (outnot === null) {
-                            console.log[msg];
+                            console.log('---------------');
+                            console.log(msg);
+                            console.log('---------------');
                             notify = {
                                 chatroom_id: socket._room.id,
                                 user_id: user.id,
