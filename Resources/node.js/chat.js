@@ -447,6 +447,9 @@ var addUser = function(socket, user, room, callback) {
             update_user = true;
         } else {
             out.dati = ephp.unserializePhp(out.dati);
+            if (!out.dati) {
+                out.dati = {};
+            }
             if (!out.dati.chat_status) {
                 out.dati.chat_status = 'Offline';
                 update_user = true;
