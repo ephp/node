@@ -160,6 +160,12 @@ io.sockets.on('connection', function(socket) {
             out.dati = ephp.unserializePhp(out.dati);
             out.dati.chat_status = status;
             setDatiUser(socket.username, out.dati);
+            var online = onlineUsers();
+            setTimeout(function() {
+                rooms.each(function(room) {
+                    io.sockets.in(room).emit('updateusers', online);
+                });
+            }, 250);
         });
     });
 
@@ -248,7 +254,8 @@ io.sockets.on('connection', function(socket) {
         setTimeout(function() {
             if (!users[socket.username]) {
                 // aggiorno l'elenco utenti
-                io.sockets.emit('updateusers', users);
+                var online = onlineUsers();
+                io.sockets.emit('updateusers', online);
                 // notifico l'evento'
                 if (socket.messages) {
                     socket.broadcast.emit('updatenotice', socket.messages.server, socket.messages.disconnect.replace(/__nickname__/g, socket.username));
@@ -260,7 +267,7 @@ io.sockets.on('connection', function(socket) {
                 socket.leave(socket.room);
                 setTimeout(function() {
                     rooms.each(function(room) {
-                        io.sockets.in(room).emit('updateusers', users);
+                        io.sockets.in(room).emit('updateusers', online);
                     });
                 }, 250);
             }
@@ -466,13 +473,14 @@ var addUser = function(socket, user, room, callback) {
         out.last_room = out.dati.chat_last_room;
         delete out.dati;
         users[user] = out;
-        socket.emit('updateusers', users);
+        var online = onlineUsers();
+        socket.emit('updateusers', online);
         setTimeout(function() {
-            if(callback) {
+            if (callback) {
                 callback();
             }
             rooms.each(function(room) {
-                io.sockets.in(room).emit('updateusers', users);
+                io.sockets.in(room).emit('updateusers', online);
             });
         }, 250);
     });
@@ -670,4 +678,14 @@ var getUserRooms = function(socket, user, pag) {
             socket.emit('updaterooms', socket.rooms, socket.room);
         });
     });
+};
+
+var onlineUsers = function() {
+    var out = {};
+    for (var name in users) {
+        if (users[name].status === 'Online') {
+            out[name] = users[name];
+        }
+    }
+    return out;
 };
