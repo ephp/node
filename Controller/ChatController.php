@@ -70,7 +70,7 @@ class ChatController extends Controller {
      * @return \Doctrine\ORM\EntityManager
      */
     private function getEm() {
-        return $this->getDoctrine()->getEntityManager();
+        return $this->getDoctrine()->getManager();
     }
 
 }
